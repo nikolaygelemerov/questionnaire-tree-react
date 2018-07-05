@@ -375,7 +375,7 @@ class QuestionnaireTree extends Component {
             stepsCopy
           );
 
-          if (child) {
+          if (child && child.parent.moreAnswers) {
             answer.color = child.parent.answerColor;
             answer.child = child.id;
           }
@@ -422,22 +422,25 @@ class QuestionnaireTree extends Component {
     });
 
     // After all questions have already set top property we can update them based on parent position top
-    this.updateQuestionPosition(stepsCopy);
+    this.updateQuestionPosition(stepsCopy, false, true);
   };
 
   //Update Question Position start
   /**
    * Update new question position base on parent top
    */
-  updateQuestionPosition = (stepsCopy, isAddAnswer) => {
-    this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
+  updateQuestionPosition = (stepsCopy, isAddAnswer, isRemoveAnswer) => {
+    this.setPositionBasedOnParent(stepsCopy);
     this.setQuestionPositionBasedOnPrev(stepsCopy);
-    this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
     this.setQuestionPositionBasedOnPrev(stepsCopy);
 
     if (isAddAnswer) {
-      this.setQuestionPositionBasedOnPrev(stepsCopy);
+      this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
       this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
+    } else if (isRemoveAnswer) {
+      this.setPositionBasedOnParent(stepsCopy);
+      this.setQuestionPositionBasedOnPrev(stepsCopy);
+      this.setQuestionPositionBasedOnPrev(stepsCopy);
     }
 
     const filteredSteps = stepsCopy.filter(step => step.length);
@@ -531,7 +534,7 @@ class QuestionnaireTree extends Component {
     });
   };
 
-  setQuestionPositionBasedOnPrev = stepsCopy => {
+  setQuestionPositionBasedOnPrev = (stepsCopy, isAddAnswer) => {
     stepsCopy.forEach((step, stepIndex) => {
       if (stepIndex !== 0) {
         stepsCopy[stepIndex].forEach((question, questionIndex) => {
@@ -550,13 +553,24 @@ class QuestionnaireTree extends Component {
                 maxTopElement = { ...parentMaxTopElement };
               }
 
-              question.top +=
-                maxTopElement.top -
-                question.top +
-                (maxTopElement.type !== 'create'
-                  ? ReactDOM.findDOMNode(maxTopElement.ref.current).clientHeight
-                  : maxTopElement.height) +
-                20;
+              if (isAddAnswer) {
+                question.top +=
+                  maxTopElement.top -
+                  question.top +
+                  (maxTopElement.type !== 'create'
+                    ? ReactDOM.findDOMNode(maxTopElement.ref.current)
+                        .clientHeight
+                    : maxTopElement.height) +
+                  20;
+              } else {
+                question.top =
+                  maxTopElement.top +
+                  (maxTopElement.type !== 'create'
+                    ? ReactDOM.findDOMNode(maxTopElement.ref.current)
+                        .clientHeight
+                    : maxTopElement.height) +
+                  20;
+              }
             } else {
               if (questionIndex !== 0) {
                 question.top =

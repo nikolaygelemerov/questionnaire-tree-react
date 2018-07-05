@@ -259,11 +259,11 @@ export const QuestionSteps = [
       answers: [
         {
           id: 'q7_a1',
-          isSelected: true
+          isSelected: false
         },
         {
           id: 'q7_a2',
-          isSelected: false
+          isSelected: true
         },
         {
           id: 'q7_a3',
@@ -331,7 +331,7 @@ export const QuestionSteps = [
       id: 'q8',
       txt: 'Is everything ok?',
       type: 'radio',
-      parent: { questionId: 'q7', answerId: 'q7_a1', answerIndex: 0 },
+      parent: { questionId: 'q7', answerId: 'q7_a2', answerIndex: 1 },
       answers: [
         {
           id: 'q8_a1',
