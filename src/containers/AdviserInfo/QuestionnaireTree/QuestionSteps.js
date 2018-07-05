@@ -43,7 +43,11 @@ export const QuestionSteps = [
         },
         {
           id: 'q2_a3',
-          isSelected: false
+          isSelected: true
+        },
+        {
+          id: 'q2_a4',
+          isSelected: true
         }
       ]
     },
@@ -113,7 +117,7 @@ export const QuestionSteps = [
       groupName: 'q4 Grafikkarte',
       groupDescription: 'Grafikkarte-Gaming',
       isMain: true,
-      txt: 'What are you doing?',
+      txt: '1 What are you doing?',
       id: 'q4',
       type: 'radio',
       parent: { questionId: 'q2', answerId: 'q2_a1', answerIndex: 0 },
@@ -152,6 +156,52 @@ export const QuestionSteps = [
         {
           id: 'q145_a3',
           isSelected: true
+        }
+      ]
+    },
+    {
+      groupName: 'q4 Grafikkarte',
+      groupDescription: 'Grafikkarte-Gaming',
+      isMain: true,
+      txt: '2 What are you doing?',
+      id: 'q4',
+      type: 'radio',
+      parent: { questionId: 'q2', answerId: 'q2_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q4_a1',
+          isSelected: false
+        },
+        {
+          id: 'q4_a2',
+          isSelected: false
+        },
+        {
+          id: 'q4_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q4 Grafikkarte',
+      groupDescription: 'Grafikkarte-Gaming',
+      isMain: true,
+      txt: '3 What are you doing?',
+      id: 'q4',
+      type: 'radio',
+      parent: { questionId: 'q2', answerId: 'q2_a4', answerIndex: 3 },
+      answers: [
+        {
+          id: 'q4_a1',
+          isSelected: false
+        },
+        {
+          id: 'q4_a2',
+          isSelected: false
+        },
+        {
+          id: 'q4_a3',
+          isSelected: false
         }
       ]
     },

@@ -134,7 +134,6 @@ class QuestionnaireTree extends Component {
 
                 selectedAnswers.forEach(answer => {
                   if (!answerWithParentColor) {
-                    console.log('here');
                     answer.color = question.parent.answerColor;
                   } else {
                     if (
@@ -163,6 +162,7 @@ class QuestionnaireTree extends Component {
 
   addNewPathAfterCheck = answerData => {
     const stepsCopy = [...this.state.steps];
+    console.log(stepsCopy[2]);
 
     //Do Something
 
@@ -174,18 +174,21 @@ class QuestionnaireTree extends Component {
     );
   };
 
-  hasAnswerChild = answerData => {
-    const stepsCopy = [...this.state.steps];
+  hasAnswerChild = (answerData, steps) => {
+    const stepsCopy = steps || [...this.state.steps];
     let hasChild;
     stepsCopy.forEach((step, stepIndex) => {
       step.forEach(question => {
         if (stepIndex !== stepsCopy.length - 1) {
           stepsCopy[stepIndex + 1].forEach(nextQuestion => {
-            if (nextQuestion.parent.answerId === answerData.id) {
-              if (answerData.id === 'q4_a1') {
-                console.log(nextQuestion);
-              }
-              hasChild = true;
+            if (
+              nextQuestion.parent.answerId === answerData.id ||
+              (nextQuestion.parent.moreAnswers &&
+                nextQuestion.parent.moreAnswers.indexOf(answerData.id) !== -1)
+            ) {
+              const parentCopy = { ...nextQuestion };
+
+              hasChild = answerData.returnParent ? parentCopy : true;
             }
           });
         }
@@ -218,14 +221,19 @@ class QuestionnaireTree extends Component {
   addAnswerColor = steps => {
     const stepsCopy = steps || [...this.state.steps];
 
+    this.handleRepetitiveQuestion(stepsCopy);
+
     stepsCopy.forEach((step, stepIndex) => {
       step.forEach(question => {
         question.answers.forEach(answer => {
           answer.color = colorGenerator();
-          answer.canCreate = !this.hasAnswerChild({
-            stepIndex,
-            id: answer.id
-          });
+          answer.canCreate = !this.hasAnswerChild(
+            {
+              stepIndex,
+              id: answer.id
+            },
+            stepsCopy
+          );
         });
 
         if (stepIndex !== 0) {
@@ -236,13 +244,6 @@ class QuestionnaireTree extends Component {
           parentQuestion.parent.answerColor = parentQuestion.answers.find(
             answer => answer.id === question.parent.answerId
           ).color;
-
-          if (stepIndex !== stepsCopy.length - 1) {
-            question.answers.find(
-              (answer, answerIndex) => !answerIndex || answer.isSelected
-            ).color =
-              parentQuestion.parent.answerColor;
-          }
         }
       });
     });
@@ -257,6 +258,38 @@ class QuestionnaireTree extends Component {
     stepsCopy[stepIndex - 1].find(
       stepQuestion => stepQuestion.id === question.parent.questionId
     );
+
+  handleRepetitiveQuestion = stepsCopy => {
+    stepsCopy.forEach((step, stepIndex) => {
+      const repetetiveList = stepsCopy[stepIndex].filter(
+        (question, questionIndex, arr) => {
+          return (
+            arr.map(mapObj => mapObj.id).indexOf(question.id) !== questionIndex
+          );
+        }
+      );
+
+      stepsCopy[stepIndex] = stepsCopy[stepIndex].filter(
+        (question, questionIndex, arr) => {
+          return (
+            arr.map(mapObj => mapObj.id).indexOf(question.id) === questionIndex
+          );
+        }
+      );
+
+      stepsCopy[stepIndex].forEach(question => {
+        let repetetiveToQuestion = repetetiveList.filter(
+          repetetiveQuestion => repetetiveQuestion.id === question.id
+        );
+
+        if (repetetiveToQuestion.length) {
+          question.parent.moreAnswers = repetetiveToQuestion.map(
+            repetetiveQuestion => repetetiveQuestion.parent.answerId
+          );
+        }
+      });
+    });
+  };
 
   /**
    * Add and update question color
@@ -326,6 +359,27 @@ class QuestionnaireTree extends Component {
             question.parent.answerColor = firstSelectedAnswer.color;
           }
         }
+      });
+    });
+
+    // update answer color based on child question
+    stepsCopy.forEach((step, stepIndex) => {
+      step.forEach(question => {
+        question.answers.forEach(answer => {
+          const child = this.hasAnswerChild(
+            {
+              stepIndex: stepIndex,
+              id: answer.id,
+              returnParent: true
+            },
+            stepsCopy
+          );
+
+          if (child) {
+            answer.color = child.parent.answerColor;
+            answer.child = child.id;
+          }
+        });
       });
     });
 
@@ -757,7 +811,7 @@ class QuestionnaireTree extends Component {
       );
     }
 
-    console.log('hasExistingParent: ', hasExistingParent);
+    //console.log('hasExistingParent: ', hasExistingParent);
 
     const question = {
       type: 'create',
