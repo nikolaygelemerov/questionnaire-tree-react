@@ -163,29 +163,6 @@ export const QuestionSteps = [
       groupName: 'q4 Grafikkarte',
       groupDescription: 'Grafikkarte-Gaming',
       isMain: true,
-      txt: '2 What are you doing?',
-      id: 'q4',
-      type: 'radio',
-      parent: { questionId: 'q2', answerId: 'q2_a3', answerIndex: 2 },
-      answers: [
-        {
-          id: 'q4_a1',
-          isSelected: false
-        },
-        {
-          id: 'q4_a2',
-          isSelected: false
-        },
-        {
-          id: 'q4_a3',
-          isSelected: false
-        }
-      ]
-    },
-    {
-      groupName: 'q4 Grafikkarte',
-      groupDescription: 'Grafikkarte-Gaming',
-      isMain: true,
       txt: '3 What are you doing?',
       id: 'q4',
       type: 'radio',

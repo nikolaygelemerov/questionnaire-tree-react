@@ -113,6 +113,27 @@ class QuestionnaireTree extends Component {
             if (!answer.isSelected) {
               this.removePathAfterUncheck(answerData);
             } else {
+              // clear selected with no parent
+              stepsCopy.forEach(step => {
+                step.forEach(question => {
+                  if (question.type !== 'create') {
+                    question.answers.forEach(answer => {
+                      if (
+                        question.id !== answerData.questionId &&
+                        !this.hasAnswerChild(
+                          {
+                            id: answer.id
+                          },
+                          stepsCopy
+                        )
+                      ) {
+                        answer.isSelected = false;
+                      }
+                    });
+                  }
+                });
+              });
+
               // generate new color and add + button
               let firstSelectedAnswer = question.answers.find(
                 innerAnswer => innerAnswer.isSelected
@@ -182,7 +203,8 @@ class QuestionnaireTree extends Component {
         if (stepIndex !== stepsCopy.length - 1) {
           stepsCopy[stepIndex + 1].forEach(nextQuestion => {
             if (
-              nextQuestion.parent.answerId === answerData.id ||
+              (nextQuestion.type !== 'create' &&
+                nextQuestion.parent.answerId === answerData.id) ||
               (nextQuestion.parent.moreAnswers &&
                 nextQuestion.parent.moreAnswers.indexOf(answerData.id) !== -1)
             ) {
@@ -375,9 +397,12 @@ class QuestionnaireTree extends Component {
             stepsCopy
           );
 
-          if (child && child.parent.moreAnswers) {
-            answer.color = child.parent.answerColor;
-            answer.child = child.id;
+          if (child) {
+            answer.childId = child.id;
+
+            if (child.parent.moreAnswers) {
+              answer.color = child.parent.answerColor;
+            }
           }
         });
       });
@@ -588,16 +613,6 @@ class QuestionnaireTree extends Component {
     });
   };
 
-  makeSomeCopy = stepsCopy => {
-    stepsCopy.forEach((step, stepIndex) => {
-      stepsCopy[stepIndex] = step.map(question => {
-        return { ...question };
-      });
-    });
-
-    return stepsCopy;
-  };
-
   findRootQuestion = (childQuestion, rootQuestion, steps) => {
     const stepsCopy = steps || [...this.state.steps];
     let rootQuestionNew = childQuestion;
@@ -673,11 +688,37 @@ class QuestionnaireTree extends Component {
 
     // Remove first selected question with the same color
     stepsCopy.forEach((step, stepIndex) => {
-      stepsCopy[stepIndex] = step.filter(
-        question =>
+      stepsCopy[stepIndex] = step.filter(question => {
+        const child = this.hasAnswerChild(
+          {
+            stepIndex: stepIndex,
+            id: answerData.id,
+            returnParent: true
+          },
+          stepsCopy
+        );
+        let canRemove;
+
+        if (child && child.parent.moreAnswers) {
+          let childQuestion = stepsCopy[child.stepIndex].find(
+            question => question.id === child.id
+          );
+
+          if (childQuestion.parent.moreAnswers.length) {
+            childQuestion.parent.moreAnswers = childQuestion.parent.moreAnswers.filter(
+              answerId => answerId !== answerData.id
+            );
+          } else {
+            delete childQuestion.parent.moreAnswers;
+            canRemove = true;
+          }
+        }
+
+        return (
           answerData.stepIndex >= stepIndex ||
-          answerData.color !== question.parent.answerColor
-      );
+          answerData.childId !== question.id
+        );
+      });
     });
 
     // Remove questions with no parents
@@ -817,15 +858,6 @@ class QuestionnaireTree extends Component {
       answerData.stepIndex,
       answerData.questionIndex
     );
-
-    let hasExistingParent;
-    if (stepsCopy[answerData.stepIndex + 1]) {
-      hasExistingParent = stepsCopy[answerData.stepIndex + 1].find(
-        question => question.parent.answerColor === answerData.color
-      );
-    }
-
-    //console.log('hasExistingParent: ', hasExistingParent);
 
     const question = {
       type: 'create',
