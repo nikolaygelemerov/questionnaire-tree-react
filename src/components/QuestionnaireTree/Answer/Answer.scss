@@ -1,0 +1,144 @@
+.Answer {
+  width: 400px;
+  height: 50px;
+
+  .AnswerTextWrapper {
+    display: inline-block;
+    position: relative;
+    width: 320px;
+    height: 100%;
+    border: 1px solid $nbbGreySemiDark;
+    border-top: none;
+    background-color: $nbbWhite;
+  }
+
+  .AnswerArrowWrapper {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 100%;
+
+    .AnswerArrow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid;
+      cursor: pointer;
+
+      .ArrowWrapper {
+        position: absolute;
+        top: 53%;
+        left: 44%;
+        transform: translate(-50%, -50%);
+
+        .Arrow {
+          display: inline-block;
+          padding: 6px;
+          transform: rotate(-45deg);
+          border: solid;
+          border-width: 0 2px 2px 0;
+        }
+      }
+    }
+  }
+
+  .InputCheckbox {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    user-select: none;
+
+    &.disabled {
+      .Checkmark {
+        cursor: not-allowed;
+      }
+    }
+
+    .Checkmark {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 0;
+      left: 0;
+      background: $nbbWhite;
+      border: 1px solid $nbbGreySemiDark;
+      cursor: pointer;
+
+      &:after {
+        opacity: 0;
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+        -ms-transform: translate(-50%, -50%) rotate(-45deg);
+        transform: translate(-50%, -69%) rotate(-45deg);
+        width: 11px;
+        height: 5px;
+        background: transparent;
+        border: 2px solid $nbbOrange;
+        border-top: none;
+        border-right: none;
+      }
+    }
+
+    input {
+      display: none;
+    }
+
+    input:checked ~ .Checkmark {
+      border-color: $nbbOrange;
+
+      &:after {
+        opacity: 1;
+      }
+    }
+  }
+
+  .InputRadio {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    user-select: none;
+
+    input {
+      display: none;
+    }
+
+    .Checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      border: 1px solid $nbbGreySemiDark;
+      cursor: pointer;
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70%;
+        height: 70%;
+        border-radius: 50%;
+      }
+    }
+
+    input:checked ~ .Checkmark {
+      background-color: $nbbWhite;
+      border: 2px solid $nbbOrange;
+
+      &:after {
+        display: block;
+        background-color: $nbbOrange;
+      }
+    }
+  }
+}

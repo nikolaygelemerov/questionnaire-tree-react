@@ -1,0 +1,19 @@
+.MainData {
+  textarea {
+    height: 10rem;
+  }
+
+  .Buttons {
+    padding: 0 1rem;
+
+    .Cancel {
+      display: inline-block;
+      width: 12rem;
+    }
+
+    .Save {
+      float: right;
+      width: 19rem;
+    }
+  }
+}

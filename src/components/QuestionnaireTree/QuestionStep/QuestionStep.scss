@@ -1,0 +1,11 @@
+.QuestionStep {
+  position: relative;
+  display: inline-block;
+  width: 400px;
+  height: auto;
+  margin-top: 10px;
+
+  &:not(:first-child) {
+    margin-left: 5px;
+  }
+}

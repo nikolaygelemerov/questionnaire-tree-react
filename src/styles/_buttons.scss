@@ -1,0 +1,38 @@
+.Edit,
+.Delete {
+  display: inline-block;
+  width: 3rem;
+  height: 3em;
+  margin: 0 0.75rem;
+  cursor: pointer;
+  background: url("/recources/svg/nbb_edit.svg") no-repeat center;
+  background-size: contain;
+
+  &:hover {
+    background-image: url("/recources/svg/nbb_edit_po.svg");
+  }
+}
+
+.Edit {
+  background-image: url("/recources/svg/nbb_edit.svg");
+
+  &:hover {
+    background-image: url("/recources/svg/nbb_edit_po.svg");
+  }
+}
+
+.Delete {
+  background-image: url("/recources/svg/nbb_delete.svg");
+
+  &:hover {
+    background-image: url("/recources/svg/nbb_delete-pos.svg");
+  }
+}
+
+.Checkmark {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background: url("/recources/svg/nbb_check_pos.svg") no-repeat center;
+  background-size: contain;
+}

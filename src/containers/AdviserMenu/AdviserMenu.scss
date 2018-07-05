@@ -1,0 +1,29 @@
+.AdviserMenu {
+  .Title {
+    height: 8rem;
+    margin-left: 2rem;
+    font-size: 2rem;
+    line-height: 8rem;
+    color: $nbbFontDefault;
+  }
+
+  .AdviserList {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: -1rem;
+    padding: 0 1rem 1rem;
+  }
+
+  .ActionBtnWrapper {
+    width: 120px;
+    height: 40px;
+  }
+
+  .ConfirmMessage {
+    width: 100%;
+    font-size: 20px;
+    text-align: center;
+  }
+}

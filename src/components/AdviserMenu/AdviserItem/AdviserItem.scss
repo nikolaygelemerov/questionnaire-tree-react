@@ -1,0 +1,22 @@
+.AdviserItem {
+  .Image {
+    .ImageContent {
+      background: url("../../../assets/images/switch/kb_icon_v1_orange.png")
+        no-repeat center;
+
+      &:hover {
+        background-image: url("../../../assets/images/switch/kb_icon_v1_white.png");
+      }
+    }
+
+    &:hover {
+      background-color: $nbbOrange;
+    }
+  }
+
+  .EditWrapper {
+    float: right;
+    height: 3rem;
+    margin: 0.75rem 0;
+  }
+}

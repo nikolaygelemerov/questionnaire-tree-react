@@ -1,0 +1,21 @@
+.NavBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+
+  .RedRow {
+    height: 2rem;
+    background-color: $nbbRedSemiDark;
+  }
+
+  .TitleRow {
+    height: 10rem;
+    margin: 0.4rem 0 0 13.3rem;
+    padding: 1rem 0 3rem 2rem;
+    color: $nbbFontDark;
+    background-color: $nbbWhite;
+    box-shadow: 0 0.3rem 0.47rem 0.03rem $nbbGreyDark;
+  }
+}

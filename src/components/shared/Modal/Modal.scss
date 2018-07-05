@@ -1,0 +1,71 @@
+.Modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 600;
+  display: none;
+  transform: translate(-50%, -50%);
+  min-width: 45rem;
+  margin: auto;
+  border: 0.1rem solid $nbbGreyDark;
+  background-color: $nbbWhite;
+
+  &.Open {
+    display: block;
+  }
+  .Close {
+    position: relative;
+    top: -1.5rem;
+    right: -1.5rem;
+    z-index: 700;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1.5rem;
+    border: 0.2rem solid $nbbGreyDark;
+    background-color: $nbbWhite;
+    cursor: pointer;
+    float: right;
+
+    &.Close:before,
+    &.Close:after {
+      position: absolute;
+      top: 0.4rem;
+      left: 1.2rem;
+      content: ' ';
+      height: 1.8rem;
+      width: 0.2rem;
+      background-color: $nbbGreyDark;
+    }
+
+    &.Close:before {
+      transform: rotate(45deg);
+    }
+
+    &.Close:after {
+      transform: rotate(-45deg);
+    }
+  }
+
+  .Title {
+    padding: 1rem;
+  }
+
+  .Content {
+    padding: 1rem;
+    border-top: 0.1rem solid $nbbGreyDark;
+    border-bottom: 0.1rem solid $nbbGreyDark;
+  }
+
+  .Buttons {
+    padding: 1rem;
+
+    .Cancel {
+      display: inline-block;
+      width: 12rem;
+    }
+
+    .Proceed {
+      float: right;
+    }
+  }
+}

@@ -1,0 +1,54 @@
+.ActionButton {
+  width: 100%;
+  padding: 0;
+  line-height: 4rem;
+  font-size: 1.6rem;
+  border: 0.1rem solid;
+  border-radius: 0.2rem;
+  cursor: pointer;
+
+  @extend .ThemeRemoveFocus;
+
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+
+    @extend .ThemeRemoveFocus;
+  }
+
+  &.WhiteOrange {
+    color: $nbbOrange;
+    border-color: $nbbOrange;
+    background-color: $nbbWhite;
+
+    &:hover {
+      color: $nbbWhite;
+      background-image: linear-gradient($nbbOrangeGradient, $nbbOrange);
+    }
+  }
+
+  &.Orange {
+    color: $nbbWhite;
+    border-color: $nbbOrange;
+
+    background-image: linear-gradient($nbbOrangeGradient, $nbbOrange);
+
+    &:hover {
+      background-image: linear-gradient($nbbOrange, $nbbOrangeGradient);
+    }
+  }
+
+  &.White {
+    color: $nbbFontLight;
+    border-color: $nbbFontLight;
+    background-color: $nbbWhite;
+
+    &:hover {
+      color: $nbbBlack;
+      border-color: $nbbFontLight;
+      background-image: linear-gradient($nbbGrey, $nbbGreyGradient);
+    }
+  }
+}
