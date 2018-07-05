@@ -335,7 +335,8 @@ class QuestionnaireTree extends Component {
                 stepAnswer.isSelected &&
                 this.hasAnswerChild({
                   stepIndex: parentQuestion.index,
-                  id: stepAnswer.id
+                  id: stepAnswer.id,
+                  stepsCopy
                 })
             );
 
@@ -352,7 +353,13 @@ class QuestionnaireTree extends Component {
             }
 
             let firstSelectedAnswer = question.answers.find(
-              answer => answer.isSelected
+              answer =>
+                answer.isSelected &&
+                this.hasAnswerChild({
+                  stepIndex: parentQuestion.index,
+                  id: answer.id,
+                  stepsCopy
+                })
             );
 
             // Add parent color to new qeustion from first selected answer

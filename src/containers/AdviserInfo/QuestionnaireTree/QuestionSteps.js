@@ -214,7 +214,7 @@ export const QuestionSteps = [
       answers: [
         {
           id: 'q6_a1',
-          isSelected: true
+          isSelected: false
         },
         {
           id: 'q6_a2',
@@ -236,7 +236,7 @@ export const QuestionSteps = [
       answers: [
         {
           id: 'q7_a1',
-          isSelected: false
+          isSelected: true
         },
         {
           id: 'q7_a2',
@@ -257,24 +257,24 @@ export const QuestionSteps = [
       parent: { questionId: 'q34', answerId: 'q34_a3', answerIndex: 2 },
       answers: [
         {
-          id: 'q3_a1',
-          isSelected: true
-        },
-        {
-          id: 'q3_a2',
-          isSelected: true
-        },
-        {
-          id: 'q3_a3',
-          isSelected: true
-        },
-        {
-          id: 'q3_a4',
+          id: 'q343_a1',
           isSelected: false
         },
         {
-          id: 'q3_a5',
-          isSelected: true
+          id: 'q343_a2',
+          isSelected: false
+        },
+        {
+          id: 'q343_a3',
+          isSelected: false
+        },
+        {
+          id: 'q343_a4',
+          isSelected: false
+        },
+        {
+          id: 'q343_a5',
+          isSelected: false
         }
       ]
     }
