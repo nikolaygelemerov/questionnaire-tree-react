@@ -454,7 +454,7 @@ class QuestionnaireTree extends Component {
     });
 
     // After all questions have already set top property we can update them based on parent position top
-    this.updateQuestionPosition(stepsCopy, false, true);
+    this.updateQuestionPosition(stepsCopy);
   };
 
   //Update Question Position start
@@ -464,13 +464,15 @@ class QuestionnaireTree extends Component {
   updateQuestionPosition = (stepsCopy, isAddAnswer, isRemoveAnswer) => {
     this.setPositionBasedOnParent(stepsCopy);
     this.setQuestionPositionBasedOnPrev(stepsCopy);
-    this.setQuestionPositionBasedOnPrev(stepsCopy);
 
     if (isAddAnswer) {
       this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
       this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
-    } else if (isRemoveAnswer) {
-      this.setPositionBasedOnParent(stepsCopy);
+      this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
+      this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
+      this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
+      this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
+    } else {
       this.setQuestionPositionBasedOnPrev(stepsCopy);
       this.setQuestionPositionBasedOnPrev(stepsCopy);
     }

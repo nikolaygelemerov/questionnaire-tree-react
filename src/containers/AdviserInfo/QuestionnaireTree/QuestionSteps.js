@@ -380,15 +380,15 @@ export const QuestionSteps = [
       answers: [
         {
           id: 'q9_a1',
-          isSelected: true
+          isSelected: false
         },
         {
           id: 'q9_a2',
-          isSelected: false
+          isSelected: true
         },
         {
           id: 'q9_a3',
-          isSelected: false
+          isSelected: true
         }
       ]
     },
@@ -478,6 +478,50 @@ export const QuestionSteps = [
         },
         {
           id: 'q114_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q94 Testerat',
+      groupDescription: 'Testerat-Gaming',
+      id: 'q94',
+      txt: 'Is Niki ok?',
+      type: 'radio',
+      parent: { questionId: 'q9', answerId: 'q9_a2', answerIndex: 1 },
+      answers: [
+        {
+          id: 'q94_a1',
+          isSelected: true
+        },
+        {
+          id: 'q94_a2',
+          isSelected: false
+        },
+        {
+          id: 'q94_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q549 Testerat',
+      groupDescription: 'Testerat-Gaming',
+      id: 'q549',
+      txt: 'Is Niki ok?',
+      type: 'radio',
+      parent: { questionId: 'q9', answerId: 'q9_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q549_a1',
+          isSelected: true
+        },
+        {
+          id: 'q549_a2',
+          isSelected: false
+        },
+        {
+          id: 'q549_a3',
           isSelected: false
         }
       ]
