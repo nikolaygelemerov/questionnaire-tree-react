@@ -430,22 +430,24 @@ class QuestionnaireTree extends Component {
   /**
    * Calculate each question position top
    */
-  calculateQuestionTopOffset = stepsCopy => {
+  calculateQuestionTopOffset = (stepsCopy, isAddAnswer) => {
     stepsCopy.forEach((step, stepIndex) => {
       let positionSum = 0;
 
       step.forEach((question, questionIndex) => {
         question.index = questionIndex;
         question.stepIndex = stepIndex;
-        question.height = ReactDOM.findDOMNode(
-          question.ref.current
-        ).clientHeight;
+        question.height =
+          question.type !== 'create'
+            ? ReactDOM.findDOMNode(question.ref.current).clientHeight
+            : question.height;
 
         // sum all prepending divs clienthHeigh in the step column
         if (stepIndex !== 0 && questionIndex !== 0) {
           positionSum +=
-            ReactDOM.findDOMNode(step[questionIndex - 1].ref.current)
-              .clientHeight + 20;
+            question.type !== 'create'
+              ? ReactDOM.findDOMNode(question.ref.current).clientHeight
+              : question.height + 20;
           question.top = positionSum;
         } else {
           question.top = 0;
@@ -454,27 +456,27 @@ class QuestionnaireTree extends Component {
     });
 
     // After all questions have already set top property we can update them based on parent position top
-    this.updateQuestionPosition(stepsCopy);
+    this.updateQuestionPosition(stepsCopy, isAddAnswer);
   };
 
   //Update Question Position start
   /**
    * Update new question position base on parent top
    */
-  updateQuestionPosition = (stepsCopy, isAddAnswer, isRemoveAnswer) => {
+  updateQuestionPosition = (stepsCopy, isAddAnswer) => {
+    this.setQuestionPositionBasedOnPrev(stepsCopy);
     this.setPositionBasedOnParent(stepsCopy);
+    this.setQuestionPositionBasedOnPrev(stepsCopy);
+    this.setPositionBasedOnParent(stepsCopy);
+    this.setQuestionPositionBasedOnPrev(stepsCopy);
+    this.setQuestionPositionBasedOnPrev(stepsCopy);
     this.setQuestionPositionBasedOnPrev(stepsCopy);
 
     if (isAddAnswer) {
-      this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
-      this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
-      this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
-      this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
-      this.setQuestionPositionBasedOnPrev(stepsCopy, isAddAnswer);
-      this.setPositionBasedOnParent(stepsCopy, isAddAnswer);
-    } else {
       this.setQuestionPositionBasedOnPrev(stepsCopy);
+      this.setPositionBasedOnParent(stepsCopy);
       this.setQuestionPositionBasedOnPrev(stepsCopy);
+      this.setPositionBasedOnParent(stepsCopy);
     }
 
     const filteredSteps = stepsCopy.filter(step => step.length);
@@ -536,31 +538,17 @@ class QuestionnaireTree extends Component {
 
               question.top = top;
               parentQuestion.top = top;
-            } else {
-              // Else get previous question top position and add current question clientHeight
-              if (questionIndex !== 0) {
-                if (isAddAnswer) {
-                  if (step[questionIndex - 1].top >= question.top) {
-                    question.top =
-                      step[questionIndex - 1].top +
-                      (step[questionIndex - 1].type !== 'create'
-                        ? ReactDOM.findDOMNode(
-                            step[questionIndex - 1].ref.current
-                          ).clientHeight
-                        : step[questionIndex - 1].height) +
-                      20;
-                  }
-                } else {
-                  question.top =
-                    step[questionIndex - 1].top +
-                    (step[questionIndex - 1].type !== 'create'
-                      ? ReactDOM.findDOMNode(
-                          step[questionIndex - 1].ref.current
-                        ).clientHeight
-                      : step[questionIndex - 1].height) +
-                    20;
-                }
-              }
+            } else if (
+              questionIndex !== 0 &&
+              step[questionIndex - 1].top >= question.top
+            ) {
+              question.top =
+                step[questionIndex - 1].top +
+                (step[questionIndex - 1].type !== 'create'
+                  ? ReactDOM.findDOMNode(step[questionIndex - 1].ref.current)
+                      .clientHeight
+                  : step[questionIndex - 1].height) +
+                20;
             }
           }
         }
@@ -573,48 +561,27 @@ class QuestionnaireTree extends Component {
       if (stepIndex !== 0) {
         stepsCopy[stepIndex].forEach((question, questionIndex) => {
           if (questionIndex !== 0) {
-            let maxTopElement = this.findMaxTop(step[questionIndex - 1]);
+            let maxTopElement = this.findMaxTop(
+              step[questionIndex - 1],
+              stepsCopy
+            );
 
             if (maxTopElement) {
-              let parentMaxTopElement;
-              if (maxTopElement.type === 'create') {
-                parentMaxTopElement = step.find(innerQuestion => {
-                  return innerQuestion.id === maxTopElement.parent.questionId;
-                });
-              }
-
-              if (parentMaxTopElement) {
-                maxTopElement = { ...parentMaxTopElement };
-              }
-
-              if (isAddAnswer) {
-                question.top +=
-                  maxTopElement.top -
-                  question.top +
-                  (maxTopElement.type !== 'create'
-                    ? ReactDOM.findDOMNode(maxTopElement.ref.current)
-                        .clientHeight
-                    : maxTopElement.height) +
-                  20;
-              } else {
-                question.top =
-                  maxTopElement.top +
-                  (maxTopElement.type !== 'create'
-                    ? ReactDOM.findDOMNode(maxTopElement.ref.current)
-                        .clientHeight
-                    : maxTopElement.height) +
-                  20;
-              }
-            } else {
-              if (questionIndex !== 0) {
-                question.top =
-                  step[questionIndex - 1].top +
-                  (step[questionIndex - 1].type !== 'create'
-                    ? ReactDOM.findDOMNode(step[questionIndex - 1].ref.current)
-                        .clientHeight
-                    : step[questionIndex - 1].height) +
-                  20;
-              }
+              question.top +=
+                maxTopElement.top -
+                question.top +
+                (maxTopElement.type !== 'create'
+                  ? ReactDOM.findDOMNode(maxTopElement.ref.current).clientHeight
+                  : maxTopElement.height) +
+                20;
+            } else if (questionIndex !== 0) {
+              question.top =
+                step[questionIndex - 1].top +
+                (step[questionIndex - 1].type !== 'create'
+                  ? ReactDOM.findDOMNode(step[questionIndex - 1].ref.current)
+                      .clientHeight
+                  : step[questionIndex - 1].height) +
+                20;
             }
           }
         });
@@ -899,9 +866,7 @@ class QuestionnaireTree extends Component {
 
     const filteredSteps = stepsCopy.filter(step => step.length);
 
-    this.setState({ steps: filteredSteps }, () =>
-      this.updateQuestionPosition(filteredSteps, true)
-    );
+    this.calculateQuestionTopOffset(filteredSteps, true);
   };
 
   cleanCreateQuestionItem = stepsCopy => {
