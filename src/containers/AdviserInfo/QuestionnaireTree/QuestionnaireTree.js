@@ -562,14 +562,28 @@ class QuestionnaireTree extends Component {
       step.forEach((question, questionIndex) => {
         if (questionIndex !== 0) {
           const prevQuestionInStep = stepsCopy[stepIndex][questionIndex - 1];
+          const prevMaxTopElement = this.findMaxTop(
+            prevQuestionInStep,
+            stepsCopy
+          );
 
-          question.top =
-            prevQuestionInStep.maxTop +
-            (prevQuestionInStep.type !== 'create'
-              ? ReactDOM.findDOMNode(prevQuestionInStep.ref.current)
-                  .clientHeight
-              : prevQuestionInStep.height) +
-            20;
+          if (prevMaxTopElement) {
+            question.top =
+              prevQuestionInStep.maxTop +
+              (prevMaxTopElement.type !== 'create'
+                ? ReactDOM.findDOMNode(prevMaxTopElement.ref.current)
+                    .clientHeight
+                : prevMaxTopElement.height) +
+              20;
+          } else {
+            question.top =
+              prevQuestionInStep.maxTop +
+              (prevQuestionInStep.type !== 'create'
+                ? ReactDOM.findDOMNode(prevQuestionInStep.ref.current)
+                    .clientHeight
+                : prevQuestionInStep.height) +
+              20;
+          }
         }
       });
     });
