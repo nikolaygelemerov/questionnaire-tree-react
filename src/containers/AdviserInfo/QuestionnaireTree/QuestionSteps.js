@@ -298,7 +298,11 @@ export const QuestionSteps = [
         },
         {
           id: 'q14_a3',
-          isSelected: false
+          isSelected: true
+        },
+        {
+          id: 'q14_a4',
+          isSelected: true
         }
       ]
     },
@@ -366,6 +370,50 @@ export const QuestionSteps = [
         },
         {
           id: 'q102_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q104 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q104',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q14', answerId: 'q14_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q104_a1',
+          isSelected: true
+        },
+        {
+          id: 'q104_a2',
+          isSelected: true
+        },
+        {
+          id: 'q104_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q103 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q103',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q14', answerId: 'q14_a4', answerIndex: 3 },
+      answers: [
+        {
+          id: 'q103_a1',
+          isSelected: true
+        },
+        {
+          id: 'q103_a2',
+          isSelected: true
+        },
+        {
+          id: 'q103_a3',
           isSelected: false
         }
       ]
