@@ -431,6 +431,15 @@ class QuestionnaireTree extends Component {
    * Calculate each question position top
    */
   calculateQuestionTopOffset = (stepsCopy, isAddAnswer) => {
+    // After all questions have already set top property we can update them based on parent position top
+    this.updateQuestionPosition(stepsCopy, isAddAnswer);
+  };
+
+  //Update Question Position start
+  /**
+   * Update new question position base on parent top
+   */
+  updateQuestionPosition = (stepsCopy, isAddAnswer) => {
     stepsCopy.forEach((step, stepIndex) => {
       let positionSum = 0;
 
@@ -458,15 +467,6 @@ class QuestionnaireTree extends Component {
       });
     });
 
-    // After all questions have already set top property we can update them based on parent position top
-    this.updateQuestionPosition(stepsCopy, isAddAnswer);
-  };
-
-  //Update Question Position start
-  /**
-   * Update new question position base on parent top
-   */
-  updateQuestionPosition = (stepsCopy, isAddAnswer) => {
     this.updateBasedOn(stepsCopy);
 
     const filteredSteps = stepsCopy.filter(step => step.length);
