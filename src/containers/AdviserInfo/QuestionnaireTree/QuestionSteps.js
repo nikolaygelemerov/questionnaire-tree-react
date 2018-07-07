@@ -531,6 +531,50 @@ export const QuestionSteps = [
       ]
     },
     {
+      groupName: 'q23 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q23',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q103', answerId: 'q103_a1', answerIndex: 0 },
+      answers: [
+        {
+          id: 'q23_a1',
+          isSelected: true
+        },
+        {
+          id: 'q23_a2',
+          isSelected: true
+        },
+        {
+          id: 'q23_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q14333 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q14333',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q103', answerId: 'q103_a2', answerIndex: 1 },
+      answers: [
+        {
+          id: 'q14333_a1',
+          isSelected: true
+        },
+        {
+          id: 'q14333_a2',
+          isSelected: true
+        },
+        {
+          id: 'q14333_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
       groupName: 'q94 Testerat',
       groupDescription: 'Testerat-Gaming',
       id: 'q94',
