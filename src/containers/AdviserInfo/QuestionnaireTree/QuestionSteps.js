@@ -414,7 +414,7 @@ export const QuestionSteps = [
         },
         {
           id: 'q103_a3',
-          isSelected: false
+          isSelected: true
         }
       ]
     },
@@ -570,7 +570,29 @@ export const QuestionSteps = [
         },
         {
           id: 'q14333_a3',
-          isSelected: false
+          isSelected: true
+        }
+      ]
+    },
+    {
+      groupName: 'q1433389 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q1433389',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q103', answerId: 'q103_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q1433389_a1',
+          isSelected: true
+        },
+        {
+          id: 'q1433389_a2',
+          isSelected: true
+        },
+        {
+          id: 'q1433389_a3',
+          isSelected: true
         }
       ]
     },
@@ -614,6 +636,74 @@ export const QuestionSteps = [
         },
         {
           id: 'q549_a3',
+          isSelected: false
+        }
+      ]
+    }
+  ],
+  [
+    {
+      groupName: 'q0991 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q0991',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q14333', answerId: 'q14333_a1', answerIndex: 0 },
+      answers: [
+        {
+          id: 'q0991_a1',
+          isSelected: true
+        },
+        {
+          id: 'q0991_a2',
+          isSelected: true
+        },
+        {
+          id: 'q0991_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q0993 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q0993',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q14333', answerId: 'q14333_a2', answerIndex: 1 },
+      answers: [
+        {
+          id: 'q0993_a1',
+          isSelected: true
+        },
+        {
+          id: 'q0993_a2',
+          isSelected: true
+        },
+        {
+          id: 'q0993_a3',
+          isSelected: false
+        }
+      ]
+    },
+    {
+      groupName: 'q0992 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q0992',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: { questionId: 'q14333', answerId: 'q14333_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q0992_a1',
+          isSelected: true
+        },
+        {
+          id: 'q0992_a2',
+          isSelected: true
+        },
+        {
+          id: 'q0992_a3',
           isSelected: false
         }
       ]
