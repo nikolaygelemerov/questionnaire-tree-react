@@ -707,6 +707,112 @@ export const QuestionSteps = [
           isSelected: false
         }
       ]
+    },
+    {
+      groupName: 'q1300 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q1300',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: {
+        questionId: 'q1433389',
+        answerId: 'q1433389_a1',
+        answerIndex: 0
+      },
+      answers: [
+        {
+          id: 'q1300_a1',
+          isSelected: false
+        },
+        {
+          id: 'q1300_a2',
+          isSelected: true
+        },
+        {
+          id: 'q1300_a3',
+          isSelected: true
+        }
+      ]
+    },
+    {
+      groupName: 'q13001 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q13001',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: {
+        questionId: 'q1433389',
+        answerId: 'q1433389_a2',
+        answerIndex: 1
+      },
+      answers: [
+        {
+          id: 'q13001_a1',
+          isSelected: false
+        },
+        {
+          id: 'q13001_a2',
+          isSelected: true
+        },
+        {
+          id: 'q13001_a3',
+          isSelected: true
+        }
+      ]
+    }
+  ],
+  [
+    {
+      groupName: 'q130009 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q130009',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: {
+        questionId: 'q1300',
+        answerId: 'q1300_a2',
+        answerIndex: 1
+      },
+      answers: [
+        {
+          id: 'q130009_a1',
+          isSelected: false
+        },
+        {
+          id: 'q130009_a2',
+          isSelected: false
+        },
+        {
+          id: 'q130009_a3',
+          isSelected: true
+        }
+      ]
+    },
+    {
+      groupName: 'q1300019 Mobilitat',
+      groupDescription: 'Mobilitat-Gaming',
+      id: 'q1300019',
+      txt: 'Is everything ok?',
+      type: 'radio',
+      parent: {
+        questionId: 'q1300',
+        answerId: 'q1300_a3',
+        answerIndex: 1
+      },
+      answers: [
+        {
+          id: 'q1300019_a1',
+          isSelected: false
+        },
+        {
+          id: 'q1300019_a2',
+          isSelected: false
+        },
+        {
+          id: 'q1300019_a3',
+          isSelected: true
+        }
+      ]
     }
   ]
 ];

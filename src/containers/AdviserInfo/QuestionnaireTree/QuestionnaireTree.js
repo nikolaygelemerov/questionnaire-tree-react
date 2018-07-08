@@ -818,6 +818,10 @@ class QuestionnaireTree extends Component {
   addNewQuestion = answerData => {
     const stepsCopy = [...this.state.steps];
 
+    if (this.checkCreateQuestionChild(stepsCopy, answerData)) {
+      return;
+    }
+
     this.cleanCreateQuestionItem(stepsCopy);
 
     const parentQuestionTop = this.findMaxTop(
@@ -843,21 +847,23 @@ class QuestionnaireTree extends Component {
       parent: {
         questionId: answerData.questionId,
         answerColor: answerData.color,
-        answerId: answerData.answerId
+        answerId: [answerData.answerId]
       },
       id: answerData.answerId
     };
 
     if (answerData.stepIndex < stepsCopy.length - 1) {
       if (typeof nextQuestionChildIndex === 'boolean') {
-        stepsCopy[answerData.stepIndex + 1].push({ ...question });
+        stepsCopy[answerData.stepIndex + 1].push(question);
       } else {
-        stepsCopy[answerData.stepIndex + 1].splice(question.insertIndex, 0, {
-          ...question
-        });
+        stepsCopy[answerData.stepIndex + 1].splice(
+          question.insertIndex,
+          0,
+          question
+        );
       }
     } else {
-      stepsCopy.push([{ ...question }]);
+      stepsCopy.push([question]);
     }
 
     const filteredSteps = stepsCopy.filter(step => step.length);
@@ -897,6 +903,37 @@ class QuestionnaireTree extends Component {
     }
   };
 
+  checkCreateQuestionChild = (stepsCopy, answerData) => {
+    let canReturn;
+
+    if (stepsCopy[answerData.stepIndex + 1]) {
+      stepsCopy[answerData.stepIndex + 1].forEach(question => {
+        if (
+          question.type === 'create' &&
+          answerData.color === question.parent.answerColor
+        ) {
+          // const parentAnswers = stepsCopy[answerData.stepIndex][
+          //   answerData.questionIndex
+          // ].answers
+          //   .filter(answer => answer.color === question.parent.answerColor)
+          //   .map(answer => answer.id);
+
+          // console.log('parentAnswers: ', parentAnswers);
+
+          // question.parent.answerId.push([...parentAnswers]);
+
+          canReturn = true;
+        }
+      });
+    }
+
+    const filteredSteps = stepsCopy.filter(step => step.length);
+
+    this.setState({ steps: filteredSteps });
+
+    return canReturn;
+  };
+
   renderSteps = () => {
     return this.state.steps.map((step, stepIndex) => {
       return (
@@ -931,6 +968,7 @@ class QuestionnaireTree extends Component {
                 questionColor={question.color}
                 questionHeight={`${question.height}px`}
                 questionIndex={questionIndex}
+                parent={question.parent}
               />
             );
           })}
