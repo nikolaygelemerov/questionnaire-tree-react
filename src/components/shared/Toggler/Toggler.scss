@@ -1,0 +1,34 @@
+.TogglerWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+
+  .TogglerTitle {
+    color: $nbbFontDefault;
+    font-weight: bold;
+  }
+
+  .ArrowIcon {
+    border: solid $nbbFontDefault;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 5px;
+
+    &.Active {
+      transform: rotate(-135deg);
+      -webkit-transform: rotate(-135deg);
+    }
+
+    &.InActive {
+      transform: rotate(45deg);
+      -webkit-transform: rotate(45deg);
+    }
+  }
+}
+
+.QuestionsToggler {
+  padding: 10px;
+  border-top: 1px solid $nbbGrey;
+  border-bottom: 1px solid $nbbGrey;
+}

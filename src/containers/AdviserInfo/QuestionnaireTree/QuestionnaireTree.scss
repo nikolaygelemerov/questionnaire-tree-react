@@ -1,5 +1,25 @@
 .QuestionnaireTree {
   width: 100%;
   height: auto;
+  overflow-x: auto;
   white-space: nowrap;
+
+  .Content {
+    color: $nbbFontDefault;
+    font-size: 15px;
+    .Question {
+    }
+
+    .AnswerWrapper {
+      display: flex;
+      align-items: center;
+      .AnswerTitle {
+        font-weight: bold;
+      }
+
+      .Answer {
+        margin-left: 5px;
+      }
+    }
+  }
 }

@@ -1,0 +1,60 @@
+.FilePicker {
+  max-width: 70%;
+
+  .AddLabel,
+  .ImageName {
+    display: inline-block;
+    font-size: 14px;
+    color: $nbbFontDefault;
+  }
+
+  .ImageName {
+    cursor: pointer;
+    text-decoration: underline;
+    width: 75%;
+    word-break: break-all;
+  }
+
+  .Icon,
+  .CheckMarkWrapper {
+    position: relative;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+  }
+
+  .CheckMarkWrapper {
+    display: inline-block;
+    border-radius: 50%;
+    background-color: $nbbGreen;
+
+    .CheckMark {
+      width: 100%;
+      height: 100%;
+      background: url("#{$resourcePath}nbb_check_white.svg") no-repeat center;
+      background-size: 70% 70%;
+    }
+  }
+
+  &:hover {
+    .RemoveButton {
+      display: inline-block;
+    }
+  }
+
+  .RemoveButton {
+    display: none;
+    width: 16px;
+    height: 16px;
+    background: url("#{$resourcePath}nbb_close_pos.svg") no-repeat center;
+    background-size: contain;
+    cursor: pointer;
+
+    &:hover {
+      background: url("#{$resourcePath}nbb_close_pos_orange.svg") no-repeat
+        center;
+      background-size: contain;
+    }
+  }
+}

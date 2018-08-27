@@ -1,0 +1,120 @@
+.Wrapper {
+  border: 1px solid $nbbGrey;
+  margin: 10px 0;
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .Header {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    border-bottom: 1px solid $nbbGrey;
+
+    .Title {
+      color: $nbbOrange;
+      font-size: 15px;
+    }
+
+    .Actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .Active {
+      }
+
+      .Reorder {
+        width: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        .ArrowUp,
+        .ArrowDown {
+          cursor: pointer;
+          border: solid $nbbFontLight;
+          border-width: 0 2px 2px 0;
+          display: inline-block;
+          padding: 4px;
+
+          &.Disabled {
+            cursor: auto;
+            border-color: $nbbGreySemiDark;
+          }
+        }
+
+        .ArrowUp {
+          transform: rotate(-135deg);
+          -webkit-transform: rotate(-135deg);
+        }
+
+        .ArrowDown {
+          transform: rotate(45deg);
+          -webkit-transform: rotate(45deg);
+        }
+      }
+    }
+  }
+
+  .Content {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    .DescriptionWrapper {
+      flex: 1;
+      border-right: 1px solid $nbbGrey;
+
+      .DescriptionTitle {
+        color: $nbbFontDark;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 5px 0;
+      }
+
+      .Description {
+        line-height: 20px;
+        color: $nbbFontDefault;
+        font-size: 12px;
+      }
+    }
+
+    .FiltersWrapper {
+      flex: 1;
+
+      .Filters {
+        padding: 0 10px;
+
+        .FiltersTitle {
+          color: $nbbFontDark;
+          font-size: 13px;
+          font-weight: bold;
+          padding: 5px 0;
+        }
+
+        .FiltersText {
+          .FilterText {
+            line-height: 20px;
+            color: $nbbFontDefault;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .Image {
+      flex: 1;
+      max-width: 170px;
+      max-height: 170px;
+
+      &.Checkbox {
+        max-width: 30px;
+        max-height: 30px;
+      }
+    }
+  }
+}

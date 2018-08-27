@@ -1,0 +1,15 @@
+.QuestionCard {
+  h4 {
+    overflow: hidden;
+    margin: 0;
+    padding: 15px 0;
+    color: $nbbFontDark;
+    font-size: 16px;
+    font-weight: normal;
+  }
+}
+
+.Answer {
+  border: none;
+  overflow-x: hidden;
+}

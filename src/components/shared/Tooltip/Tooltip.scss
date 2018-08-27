@@ -1,0 +1,39 @@
+.Tooltip {
+  position: relative;
+
+  .Image {
+    width: 20px;
+    height: 20px;
+    background: url("#{$resourcePath}nbb_info_blue.svg") no-repeat center;
+    background-size: contain;
+  }
+
+  &::after {
+    position: absolute;
+    display: none;
+    width: 500px;
+    top: 120%;
+    left: 150%;
+    opacity: 0;
+    color: $nbbFontDefault;
+    font-weight: normal;
+    z-index: 5;
+  }
+
+  &::after {
+    content: attr(data-tooltip);
+    padding: 10px;
+    font-size: 1.2em;
+    text-align: left;
+    box-shadow: 0 1px 5px 1px 0 $nbbBlueInfo;
+    background-color: $nbbWhite;
+    border: 1px solid $nbbBlueInfo;
+  }
+
+  &:hover {
+    &::after {
+      display: inline-block;
+      opacity: 1;
+    }
+  }
+}

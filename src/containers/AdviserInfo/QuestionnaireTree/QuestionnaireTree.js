@@ -1,106 +1,315 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { deepCopy } from 'fast-deep-copy';
 
 import classes from './QuestionnaireTree.scss';
 import QuestionCreateItem from '../../../components/QuestionnaireTree/QuestionCreateItem/QuestionCreateItem';
-import QuestionCheckboxItem from '../../../components/QuestionnaireTree/QuestionCheckboxItem/QuestionCheckboxItem';
-import { idGenerator } from '../../../helpers/helpers';
-import { colorGenerator } from '../../../helpers/helpers';
-import { QuestionSteps } from './QuestionSteps';
+import QuestionItem from '../../../components/QuestionnaireTree/QuestionItem/QuestionItem';
+import { idGenerator } from '../../../services/helpers';
+import { colorGenerator } from '../../../services/helpers';
+import { idStringReplace } from '../../../services/helpers';
 import QuestionStep from '../../../components/QuestionnaireTree/QuestionStep/QuestionStep';
 import axios from '../../../services/axios';
 import { questionnaireTree } from '../../../translations/translations';
 import Loader from '../../../components/shared/Loader/Loader';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
-import withProviderConsumer from '../../../hoc/withProviderConsumer/withProviderConsumer';
 import URLS from '../../../constants/urls';
-import { withRouter } from 'react-router-dom';
+import { TREE } from '../../../constants/backendUrls';
+import {
+  QUESTIONNAIRE_TREE,
+  BUTTON_TYPES,
+  ACTION_BUTTON_ORANGE,
+  TREE_COLORS
+} from '../../../constants/constants';
+import * as actionCreators from '../../../store/actions';
+import withProviderConsumer from '../../../hoc/withProviderConsumer/withProviderConsumer';
+import Modal from '../../../components/shared/Modal/Modal';
+import ActionButton from '../../../components/shared/ActionButton/ActionButton';
+import { QuestionSteps } from './QuestionSteps';
 
 class QuestionnaireTree extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      treeHeight: 'auto'
+      treeHeight: 'auto',
+      questions: [],
+      isRequestExecuted: false,
+      showModal: false,
+      clickedQuestioniId: '',
+      clickedAnswerData: {},
+      answersWrapperScrollTop: 0,
+      colorsUsed: []
     };
+
+    this.advisorId = this.props.match.params.id;
+    this.colorsUsed = [];
+    this.treeRef = React.createRef();
+    this.treeScrollX = 0;
   }
 
   componentDidMount() {
-    this.fetchTree();
+    // this.props.dispatch(
+    //   actionCreators.addAdviserId(this.props.match.params.id, () => {
+    //     this.getTree();
+    //   })
+    // );
+
+    QuestionSteps.forEach(step => {
+      step.ref = React.createRef();
+
+      step.forEach(question => {
+        question.ref = React.createRef();
+
+        if (!question.parent) {
+          question.parent = {
+            questionId: null,
+            answerId: null,
+            answerIndex: null
+          };
+        }
+      });
+    });
+
+    const filteredSteps = QuestionSteps.filter(step => step.length);
+
+    this.setState({ steps: filteredSteps, isRequestExecuted: true }, () =>
+      this.addAnswerColor()
+    );
   }
 
   componentDidUpdate() {}
 
-  static fetchTreeModalCallback = history => {
+  navigateToMainPage = history => {
     history.push(`${URLS.root}`);
   };
 
-  fetchTree = async () => {
-    try {
-      const response = await axios.get(`/${this.props.match.params.id || ''}`, {
-        params: {},
-        errorMsg: 'questionnaireTree'
+  fetchQuestions = answerData => {
+    const treeNode = ReactDOM.findDOMNode(this.treeRef.current);
+    if (treeNode) {
+      this.treeScrollX = treeNode.scrollLeft;
+    }
+
+    if (answerData && this.handleExistingCreateQuestion(answerData)) {
+      return;
+    } else {
+      this.setState({ isRequestExecuted: false }, async () => {
+        try {
+          const response = await axios.get(
+            idStringReplace(TREE.get.availableQustions, this.advisorId),
+            {
+              errorMsg: questionnaireTree.availableQuestionsErrMsg,
+              errorCallback: () => {}
+            }
+          );
+
+          let questions = {};
+
+          if (response.data) {
+            questions = { ...response.data };
+          }
+
+          questions = Object.keys(questions).map(
+            propName => questions[propName]
+          );
+
+          this.setState(
+            {
+              questions: [...questions],
+              isRequestExecuted: true
+            },
+            () => {
+              this.state.isRequestExecuted &&
+                this.state.steps &&
+                this.state.steps.length &&
+                answerData &&
+                this.addNewQuestion(answerData, questions);
+            }
+          );
+        } catch (error) {
+          console.error(error);
+        }
       });
-
-      if (response) {
-        QuestionSteps.forEach(step => {
-          step.ref = React.createRef();
-
-          step.forEach(question => {
-            question.ref = React.createRef();
-          });
-        });
-
-        let mockSteps = [];
-
-        this.setState(
-          { steps: [...QuestionSteps] },
-          () => QuestionSteps.length && this.addAnswerColor(QuestionSteps)
-        );
-      }
-    } catch (error) {
-      console.error(error);
     }
   };
 
-  clickButton = async () => {
-    const stepsCopy = [];
-    try {
-      const response = await axios.get('/', {
-        params: {},
-        errorMsg: questionnaireTree
+  addQuestionToTree = params => {
+    const treeNode = ReactDOM.findDOMNode(this.treeRef.current);
+    if (treeNode) {
+      this.treeScrollX =
+        treeNode.scrollLeft - QUESTIONNAIRE_TREE.questionItemWidth;
+    }
+
+    this.setState({ isRequestExecuted: false }, async () => {
+      try {
+        const response = await axios.post(
+          idStringReplace(TREE.post.questionToTree, this.advisorId),
+          { ...params },
+          {
+            errorMsg: questionnaireTree.addQuestionErrMsg,
+            errorCallback: this.getTree
+          }
+        );
+
+        this.fetchTree(response, true);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
+
+  getTree = params => {
+    this.setState({ isRequestExecuted: false }, async () => {
+      try {
+        const response = await axios.get(
+          idStringReplace(TREE.get.tree, this.advisorId),
+          {
+            errorMsg: questionnaireTree.treeErroMsg,
+            errorCallback: this.fetchQuestions
+          }
+        );
+        this.fetchTree(response);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
+
+  removeAfterAnswerUncheck = answerData => {
+    const stepsCopy = [...this.state.steps];
+    const hasChild = this.hasAnswerChild(
+      { id: answerData.id, returnCreateParent: true },
+      stepsCopy
+    );
+
+    if (!hasChild || hasChild.type === QUESTIONNAIRE_TREE.typeCreate) {
+      const stepsCopy = [...this.state.steps];
+
+      stepsCopy[answerData.stepIndex].forEach(question => {
+        if (question.id === answerData.quesitonId) {
+          question.answers.forEach(answer => {
+            if (answer.id === answerData.id) {
+              answer.isParent = false;
+            }
+          });
+        }
       });
 
-      if (response) {
-        stepsCopy.forEach(step => {
-          step.ref = React.createRef();
+      if (hasChild) {
+        //this.getTree(); fetch from backend optionally else:
+        stepsCopy.forEach((step, stepIndex) => {
+          if (stepsCopy[stepIndex + 1]) {
+            stepsCopy[stepIndex + 1].forEach(question => {
+              if (question.id === hasChild.id) {
+                question.parent.answerId = hasChild.parent.answerId.filter(
+                  id => id !== answerData.id
+                );
 
-          step.forEach(question => {
-            question.ref = React.createRef();
-          });
+                if (!question.parent.answerId.length) {
+                  this.cleanCreateQuestionItem(stepsCopy);
+                }
+              }
+            });
+          }
         });
 
-        this.setState({ steps: [...QuestionSteps] }, () =>
-          this.addAnswerColor(stepsCopy)
-        );
+        const filteredSteps = stepsCopy.filter(step => step.length);
+
+        this.calculateQuestionTopOffset(filteredSteps);
+      } else {
+        const filteredSteps = stepsCopy.filter(step => step.length);
+
+        this.setState({ steps: filteredSteps });
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      this.setState(
+        { isRequestExecuted: false, showModal: false, clickedAnswerData: {} },
+        async () => {
+          try {
+            const response = await axios.delete(
+              `${idStringReplace(TREE.delete.answer, this.advisorId)}${
+                answerData.id
+              }`,
+              {
+                errorMsg: questionnaireTree.deleteAnswerErrMsg
+              }
+            );
+
+            this.fetchTree(response);
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      );
     }
   };
 
-  /**
-   * Check/uncheck answer
-   */
-  checkAnswer = (stepIndex, questionId, answerId) => {
+  removeAfterQuestionClick = async questionId => {
+    this.setState(
+      { isRequestExecuted: false, clickedQuestioniId: null, showModal: false },
+      async () => {
+        try {
+          const response = await axios.delete(
+            `${idStringReplace(
+              TREE.delete.question,
+              this.advisorId
+            )}${questionId}`,
+            {
+              errorMsg: questionnaireTree.deleteQuestionErrMsg
+            }
+          );
+          this.fetchTree(response);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    );
+  };
+
+  fetchTree = (response, triggerScroll) => {
+    const questionSteps = [...response.data];
+    this.colorsUsed = [];
+
+    if (questionSteps.length) {
+      questionSteps.forEach(step => {
+        step.ref = React.createRef();
+
+        step.forEach(question => {
+          question.ref = React.createRef();
+
+          if (!question.parent) {
+            question.parent = {
+              questionId: null,
+              answerId: null,
+              answerIndex: null
+            };
+          }
+        });
+      });
+
+      const filteredSteps = questionSteps.filter(step => step.length);
+
+      this.setState({ steps: filteredSteps, isRequestExecuted: true }, () => {
+        this.state.isRequestExecuted &&
+          this.addAnswerColor(filteredSteps, triggerScroll);
+      });
+    } else {
+      this.setState({ steps: [] }, () => this.fetchQuestions());
+    }
+  };
+
+  checkAnswer = (stepIndex, questionId, answerId, scrollTop) => {
     const stepsCopy = [...this.state.steps];
 
     stepsCopy[stepIndex].forEach(question => {
       if (question.id === questionId) {
         question.answers.forEach((answer, answerIndex) => {
           if (answer.id === answerId) {
-            answer.isSelected = !answer.isSelected;
+            //if answer is already checked do nothing
+            if (answer.isParent) {
+              return;
+            }
+
+            answer.isParent = !answer.isParent;
 
             let answerData = {
               questionId: question.id,
@@ -110,13 +319,43 @@ class QuestionnaireTree extends Component {
               ...answer
             };
 
-            if (!answer.isSelected) {
-              this.removePathAfterUncheck(answerData);
+            if (!answer.isParent) {
+              answer.activeCreateChild = false;
+
+              stepsCopy[stepIndex].forEach(innerQuestion => {
+                if (innerQuestion.id === question.id) {
+                  innerQuestion.answers.forEach(innerAnswer => {
+                    if (!innerAnswer.isParent) {
+                      innerAnswer.activeCreateChild = false;
+                    }
+                  });
+                }
+              });
+              if (
+                this.hasAnswerChild(
+                  {
+                    id: answer.id
+                  },
+                  stepsCopy
+                )
+              ) {
+                this.setState({
+                  showModal: true,
+                  clickedAnswerData: {
+                    id: answerData.id,
+                    stepIndex: answerData.stepIndex
+                  }
+                });
+              } else {
+                this.removeAfterAnswerUncheck({
+                  ...answerData,
+                  activeCreateChild: false
+                });
+              }
             } else {
-              // clear selected with no parent
               stepsCopy.forEach(step => {
                 step.forEach(question => {
-                  if (question.type !== 'create') {
+                  if (question.type !== QUESTIONNAIRE_TREE.typeCreate) {
                     question.answers.forEach(answer => {
                       if (
                         question.id !== answerData.questionId &&
@@ -125,55 +364,95 @@ class QuestionnaireTree extends Component {
                             id: answer.id
                           },
                           stepsCopy
+                        ) &&
+                        question.type !== QUESTIONNAIRE_TREE.typeCheckbox &&
+                        question.type !== QUESTIONNAIRE_TREE.typeSlider
+                      ) {
+                        answer.isParent = false;
+                      } else if (
+                        !this.hasAnswerChild(
+                          {
+                            id: answer.id,
+                            returnCreateParent: true
+                          },
+                          stepsCopy
                         )
                       ) {
-                        answer.isSelected = false;
+                        answer.activeCreateChild = false;
                       }
                     });
                   }
                 });
               });
 
-              // generate new color and add + button
               let firstSelectedAnswer = question.answers.find(
-                innerAnswer => innerAnswer.isSelected
+                innerAnswer => innerAnswer.isParent
               );
 
               const selectedAnswers = question.answers.filter(
-                answer => answer.isSelected
+                answer => answer.isParent
               );
 
               if (selectedAnswers.length > 1) {
-                const color = colorGenerator();
                 const answerWithParentColor = selectedAnswers.find(
                   answer =>
                     answer.color === question.parent.answerColor &&
-                    this.hasAnswerChild({
-                      id: answer.id
-                    })
+                    this.hasAnswerChild(
+                      {
+                        id: answer.id
+                      },
+                      stepsCopy
+                    )
                 );
+
+                let parentCreateItem;
+                selectedAnswers.forEach(answer => {
+                  const parentCreate = this.hasAnswerChild(
+                    {
+                      id: answer.id,
+                      returnCreateParent: true
+                    },
+                    stepsCopy
+                  );
+
+                  if (typeof parentCreate === 'object') {
+                    parentCreateItem = parentCreate;
+                  }
+                });
 
                 selectedAnswers.forEach(answer => {
                   if (!answerWithParentColor) {
                     answer.color = question.parent.answerColor;
-                  } else {
-                    if (
-                      !this.hasAnswerChild({
+                  } else if (
+                    !this.hasAnswerChild(
+                      {
                         id: answer.id
-                      })
-                    ) {
-                      answer.color = color;
+                      },
+                      stepsCopy
+                    )
+                  ) {
+                    if (parentCreateItem) {
+                      answer.color = parentCreateItem.parent.answerColor;
+                    } else {
+                      answer.color = this.getUniqueColor(answer.branchLevel);
                     }
                   }
                 });
               } else {
-                firstSelectedAnswer.color = question.parent.answerColor;
+                if (stepIndex !== 0) {
+                  firstSelectedAnswer.color = question.parent.answerColor;
+                } else {
+                  const color = this.getUniqueColor(answer.branchLevel);
+
+                  firstSelectedAnswer.color = color;
+                  question.parent.answerColor = firstSelectedAnswer.color;
+                }
               }
 
               answer.canCreate = true;
               answerData = { ...answerData, canCreate: answer.canCreate };
 
-              this.addNewPathAfterCheck(answerData);
+              this.addNewPathAfterCheck(answerData, scrollTop);
             }
           }
         });
@@ -181,16 +460,12 @@ class QuestionnaireTree extends Component {
     });
   };
 
-  addNewPathAfterCheck = answerData => {
+  addNewPathAfterCheck = (answerData, scrollTop) => {
     const stepsCopy = [...this.state.steps];
-    console.log(stepsCopy[2]);
-
-    //Do Something
-
     const filteredSteps = stepsCopy.filter(step => step.length);
 
     this.setState(
-      { steps: filteredSteps },
+      { steps: filteredSteps, answersWrapperScrollTop: scrollTop },
       () => false && this.addAnswerColor(stepsCopy)
     );
   };
@@ -198,19 +473,28 @@ class QuestionnaireTree extends Component {
   hasAnswerChild = (answerData, steps) => {
     const stepsCopy = steps || [...this.state.steps];
     let hasChild;
+
     stepsCopy.forEach((step, stepIndex) => {
       step.forEach(question => {
         if (stepIndex !== stepsCopy.length - 1) {
           stepsCopy[stepIndex + 1].forEach(nextQuestion => {
             if (
-              (nextQuestion.type !== 'create' &&
+              (nextQuestion.type !== QUESTIONNAIRE_TREE.typeCreate &&
                 nextQuestion.parent.answerId === answerData.id) ||
               (nextQuestion.parent.moreAnswers &&
                 nextQuestion.parent.moreAnswers.indexOf(answerData.id) !== -1)
             ) {
               const parentCopy = { ...nextQuestion };
-
               hasChild = answerData.returnParent ? parentCopy : true;
+            }
+
+            if (
+              answerData.returnCreateParent &&
+              nextQuestion.type === QUESTIONNAIRE_TREE.typeCreate &&
+              (nextQuestion.parent.answerId &&
+                nextQuestion.parent.answerId.indexOf(answerData.id) !== -1)
+            ) {
+              hasChild = nextQuestion;
             }
           });
         }
@@ -237,25 +521,77 @@ class QuestionnaireTree extends Component {
     return hasChild;
   };
 
-  /**
-   * Initial generating of answer color
-   */
-  addAnswerColor = steps => {
+  addAnswerColor = (steps, triggerScroll) => {
     const stepsCopy = steps || [...this.state.steps];
 
     this.handleRepetitiveQuestion(stepsCopy);
+    this.addBranchLevel(stepsCopy);
 
     stepsCopy.forEach((step, stepIndex) => {
       step.forEach(question => {
+        let uniqueChildIds = [];
         question.answers.forEach(answer => {
-          answer.color = colorGenerator();
-          answer.canCreate = !this.hasAnswerChild(
+          const answerChild = this.hasAnswerChild(
             {
               stepIndex,
-              id: answer.id
+              id: answer.id,
+              returnParent: true
             },
             stepsCopy
           );
+
+          if (
+            question.type === QUESTIONNAIRE_TREE.typeCheckbox ||
+            question.type === QUESTIONNAIRE_TREE.typeSlider
+          ) {
+            if (question.answers.find(answer => answer.isParent)) {
+              answer.isParent = true;
+            } else {
+              answer.isParent = false;
+            }
+          } else {
+            answer.activeCreateChild = false;
+            answer.canCreate = !answerChild;
+
+            if (answerChild) {
+              answer.childId = answerChild.id;
+
+              if (stepIndex !== 0) {
+                let firstSelectedAnswer;
+                let firstAnswerChild;
+
+                firstSelectedAnswer = question.answers.find(answer => {
+                  firstAnswerChild = this.hasAnswerChild(
+                    {
+                      id: answer.id,
+                      returnParent: true
+                    },
+                    stepsCopy
+                  );
+
+                  return answer.isParent && firstAnswerChild;
+                });
+
+                if (
+                  !firstSelectedAnswer ||
+                  (firstSelectedAnswer && firstSelectedAnswer.id !== answer.id)
+                ) {
+                  answer.color = this.getUniqueColor(
+                    answer.branchLevel,
+                    answer
+                  );
+                }
+              } else {
+                if (uniqueChildIds.indexOf(answer.childId)) {
+                  uniqueChildIds.push(answer.childId);
+                  answer.color = this.getUniqueColor(
+                    answer.branchLevel,
+                    answer
+                  );
+                }
+              }
+            }
+          }
         });
 
         if (stepIndex !== 0) {
@@ -270,12 +606,9 @@ class QuestionnaireTree extends Component {
       });
     });
 
-    this.addQuestionColor(stepsCopy);
+    this.addQuestionColor(stepsCopy, null, triggerScroll);
   };
 
-  /**
-   * Get parent question
-   */
   getParentQuestion = (stepsCopy, stepIndex, question) =>
     stepsCopy[stepIndex - 1].find(
       stepQuestion => stepQuestion.id === question.parent.questionId
@@ -313,10 +646,7 @@ class QuestionnaireTree extends Component {
     });
   };
 
-  /**
-   * Add and update question color
-   */
-  addQuestionColor = (steps, answerData) => {
+  addQuestionColor = (steps, answerData, triggerScroll) => {
     let stepsCopy = [...steps];
 
     stepsCopy.forEach((step, stepIndex) => {
@@ -328,16 +658,17 @@ class QuestionnaireTree extends Component {
             question
           );
 
-          // Check if parent question exists and set colors depending on selected answers
           if (parentQuestion) {
             let selectedParentAnswer = parentQuestion.answers.find(
               stepAnswer =>
-                stepAnswer.isSelected &&
-                this.hasAnswerChild({
-                  stepIndex: parentQuestion.index,
-                  id: stepAnswer.id,
+                stepAnswer.isParent &&
+                this.hasAnswerChild(
+                  {
+                    stepIndex: parentQuestion.index,
+                    id: stepAnswer.id
+                  },
                   stepsCopy
-                })
+                )
             );
 
             if (
@@ -346,7 +677,6 @@ class QuestionnaireTree extends Component {
             ) {
               question.parent.answerColor = parentQuestion.parent.answerColor;
             } else {
-              // If not the first selected answer add color of the selected one
               question.parent.answerColor = parentQuestion.answers.find(
                 answer => answer.id === question.parent.answerId
               ).color;
@@ -354,15 +684,16 @@ class QuestionnaireTree extends Component {
 
             let firstSelectedAnswer = question.answers.find(
               answer =>
-                answer.isSelected &&
-                this.hasAnswerChild({
-                  stepIndex: parentQuestion.index,
-                  id: answer.id,
+                answer.isParent &&
+                this.hasAnswerChild(
+                  {
+                    stepIndex: parentQuestion.index,
+                    id: answer.id
+                  },
                   stepsCopy
-                })
+                )
             );
 
-            // Add parent color to new qeustion from first selected answer
             if (firstSelectedAnswer) {
               const selectedAnswers = question.answers.find(
                 answer => answer.color === question.parent.answerColor
@@ -375,13 +706,16 @@ class QuestionnaireTree extends Component {
                 (selectedAnswers && !answerData)
               ) {
                 firstSelectedAnswer.color = question.parent.answerColor;
+
+                this.colorsUsed = this.colorsUsed.filter(
+                  color => color !== firstSelectedAnswer.branchColor
+                );
               }
             }
           }
         } else {
-          // Add the first selected answer color of the root question
           const firstSelectedAnswer = question.answers.find(
-            answer => answer.isSelected
+            answer => answer.isParent
           );
 
           if (firstSelectedAnswer) {
@@ -391,7 +725,6 @@ class QuestionnaireTree extends Component {
       });
     });
 
-    // update answer color based on child question
     stepsCopy.forEach((step, stepIndex) => {
       step.forEach(question => {
         question.answers.forEach(answer => {
@@ -410,6 +743,32 @@ class QuestionnaireTree extends Component {
             if (child.parent.moreAnswers) {
               answer.color = child.parent.answerColor;
             }
+
+            if (question.type === QUESTIONNAIRE_TREE.typeCreate) {
+              question.answers.forEach(
+                answer => (answer.color = child.parent.answerColor)
+              );
+            }
+          }
+
+          if (question.type === QUESTIONNAIRE_TREE.typeSlider) {
+            if (question.parent.answerColor) {
+              question.answers.forEach(
+                answer => (answer.color = question.parent.answerColor)
+              );
+            }
+          }
+
+          if (question.type === QUESTIONNAIRE_TREE.typeCheckbox) {
+            if (question.parent.answerColor) {
+              question.answers.forEach(
+                answer => (answer.color = question.parent.answerColor)
+              );
+            }
+
+            if (question.answers.find(answer => answer.isParent)) {
+              question.answers.forEach(answer => (answer.isParent = true));
+            }
           }
         });
       });
@@ -419,36 +778,25 @@ class QuestionnaireTree extends Component {
       this.toggleQuestionHeight(stepsCopy, answerData.questionColor);
     }
 
-    const filteredSteps = stepsCopy.filter(step => step.length);
-
-    // Here after steps are updated we calculate the height of each question
-    this.setState({ steps: filteredSteps }, () =>
-      this.calculateQuestionTopOffset(stepsCopy)
-    );
+    this.calculateQuestionTopOffset(stepsCopy, [], triggerScroll);
   };
 
-  /**
-   * Calculate each question position top
-   */
-  calculateQuestionTopOffset = stepsCopy => {
+  calculateQuestionTopOffset = (stepsCopy, questions = [], createQuestion) => {
     stepsCopy.forEach((step, stepIndex) => {
-      let positionSum = 0;
-      // caclulate start top offset
       step.forEach((question, questionIndex) => {
         question.index = questionIndex;
         question.stepIndex = stepIndex;
         question.height =
-          question.type !== 'create'
+          question.type !== QUESTIONNAIRE_TREE.typeCreate
             ? ReactDOM.findDOMNode(question.ref.current).clientHeight
             : question.height;
 
-        // sum all prepending divs clienthHeigh in the step column
         if (stepIndex !== 0 && questionIndex !== 0) {
           const prevQuestion = stepsCopy[stepIndex][questionIndex - 1];
 
           question.top =
             prevQuestion.top +
-            (prevQuestion.type !== 'create'
+            (prevQuestion.type !== QUESTIONNAIRE_TREE.typeCreate
               ? ReactDOM.findDOMNode(prevQuestion.ref.current).clientHeight
               : prevQuestion.height) +
             20;
@@ -460,10 +808,17 @@ class QuestionnaireTree extends Component {
 
     this.updateQuestionPosition(stepsCopy);
 
+    const treeHeight = this.setTreeHeight(stepsCopy);
+
     const filteredSteps = stepsCopy.filter(step => step.length);
 
-    this.setState({ steps: filteredSteps }, () =>
-      this.setTreeHeight(filteredSteps)
+    this.setState(
+      {
+        steps: filteredSteps,
+        questions: [...questions],
+        treeHeight
+      },
+      () => createQuestion && this.scrollOnQuestionAdd(createQuestion)
     );
   };
 
@@ -480,35 +835,61 @@ class QuestionnaireTree extends Component {
   setTreeHeight = stepsCopy => {
     let lastQuestionMain;
     let treeHeight;
+    const mainQuestion = stepsCopy[0][0];
 
     if (stepsCopy[1] && stepsCopy[1].length) {
       lastQuestionMain = stepsCopy[1][stepsCopy[1].length - 1];
       let maxTopElement = this.findMaxTop(lastQuestionMain, stepsCopy);
 
       if (maxTopElement) {
-        treeHeight =
+        if (
           maxTopElement.top +
-          (maxTopElement.type !== 'create'
-            ? ReactDOM.findDOMNode(maxTopElement.ref.current).clientHeight
-            : maxTopElement.height) +
-          20;
+            (maxTopElement.type !== QUESTIONNAIRE_TREE.typeCreate
+              ? ReactDOM.findDOMNode(maxTopElement.ref.current).clientHeight
+              : maxTopElement.height) >=
+          mainQuestion.top +
+            ReactDOM.findDOMNode(mainQuestion.ref.current).clientHeight
+        ) {
+          treeHeight =
+            maxTopElement.top +
+            (maxTopElement.type !== QUESTIONNAIRE_TREE.typeCreate
+              ? ReactDOM.findDOMNode(maxTopElement.ref.current).clientHeight
+              : maxTopElement.height) +
+            20;
+        } else {
+          treeHeight =
+            ReactDOM.findDOMNode(mainQuestion.ref.current).clientHeight + 20;
+        }
       } else {
-        treeHeight =
+        if (
+          lastQuestionMain &&
           lastQuestionMain.top +
-          (lastQuestionMain.type !== 'create'
-            ? ReactDOM.findDOMNode(lastQuestionMain.ref.current).clientHeight
-            : lastQuestionMain.height) +
-          20;
+            (lastQuestionMain.type !== QUESTIONNAIRE_TREE.typeCreate
+              ? ReactDOM.findDOMNode(lastQuestionMain.ref.current).clientHeight
+              : lastQuestionMain.height) >=
+            mainQuestion.top +
+              ReactDOM.findDOMNode(mainQuestion.ref.current).clientHeight
+        ) {
+          treeHeight =
+            lastQuestionMain.top +
+            (lastQuestionMain.type !== QUESTIONNAIRE_TREE.typeCreate
+              ? ReactDOM.findDOMNode(lastQuestionMain.ref.current).clientHeight
+              : lastQuestionMain.height) +
+            20;
+        } else {
+          treeHeight =
+            ReactDOM.findDOMNode(mainQuestion.ref.current).clientHeight + 20;
+        }
       }
     } else {
       treeHeight =
-        ReactDOM.findDOMNode(stepsCopy[0][0].ref.current).clientHeight + 20;
+        ReactDOM.findDOMNode(mainQuestion.ref.current).clientHeight + 20;
     }
 
-    this.setState({ treeHeight });
+    return treeHeight;
   };
 
-  setPositionBasedOnParent = (stepsCopy, isAddAnswer) => {
+  setPositionBasedOnParent = stepsCopy => {
     stepsCopy.forEach((step, stepIndex) => {
       step.forEach((question, questionIndex) => {
         if (stepIndex !== 0) {
@@ -519,7 +900,6 @@ class QuestionnaireTree extends Component {
           );
 
           if (parentQuestion) {
-            // If question color mathes parent color set it's position the same as parent
             if (
               parentQuestion.parent.answerColor ===
                 question.parent.answerColor ||
@@ -536,7 +916,7 @@ class QuestionnaireTree extends Component {
     });
   };
 
-  setQuestionPositionBasedOnPrev = (stepsCopy, isAddAnswer) => {
+  setQuestionPositionBasedOnPrev = stepsCopy => {
     stepsCopy.forEach(step => {
       step.forEach(question => {
         const maxTopElement = this.findMaxTop(question, stepsCopy);
@@ -561,7 +941,7 @@ class QuestionnaireTree extends Component {
           if (prevMaxTopElement) {
             question.top =
               prevQuestionInStep.maxTop +
-              (prevMaxTopElement.type !== 'create'
+              (prevMaxTopElement.type !== QUESTIONNAIRE_TREE.typeCreate
                 ? ReactDOM.findDOMNode(prevMaxTopElement.ref.current)
                     .clientHeight
                 : prevMaxTopElement.height) +
@@ -569,7 +949,7 @@ class QuestionnaireTree extends Component {
           } else {
             question.top =
               prevQuestionInStep.maxTop +
-              (prevQuestionInStep.type !== 'create'
+              (prevQuestionInStep.type !== QUESTIONNAIRE_TREE.typeCreate
                 ? ReactDOM.findDOMNode(prevQuestionInStep.ref.current)
                     .clientHeight
                 : prevQuestionInStep.height) +
@@ -635,108 +1015,6 @@ class QuestionnaireTree extends Component {
 
     return maxTopElement;
   };
-  //Update Question Position end
-
-  /**
-   * Remove branch path from unchecked root
-   */
-  removePathAfterUncheck = answerData => {
-    const stepsCopy = [...this.state.steps];
-
-    this.cleanCreateQuestionItem(stepsCopy);
-
-    // Remove 1st column question explicitly
-    if (answerData.stepIndex === 0 && stepsCopy.length > 1) {
-      stepsCopy[1] = stepsCopy[1].filter(
-        question => question.parent.answerColor !== answerData.color
-      );
-
-      stepsCopy[0][0].answers.forEach(answer => {
-        if (answer.id === answerData.id) {
-          answer.isActive = false;
-        }
-      });
-    }
-
-    // Remove first selected question with the same color
-    stepsCopy.forEach((step, stepIndex) => {
-      stepsCopy[stepIndex] = step.filter(question => {
-        const child = this.hasAnswerChild(
-          {
-            stepIndex: stepIndex,
-            id: answerData.id,
-            returnParent: true
-          },
-          stepsCopy
-        );
-        let canRemove;
-
-        if (child && child.parent.moreAnswers) {
-          let childQuestion = stepsCopy[child.stepIndex].find(
-            question => question.id === child.id
-          );
-
-          if (childQuestion.parent.moreAnswers.length) {
-            childQuestion.parent.moreAnswers = childQuestion.parent.moreAnswers.filter(
-              answerId => answerId !== answerData.id
-            );
-          } else {
-            delete childQuestion.parent.moreAnswers;
-            canRemove = true;
-          }
-        }
-
-        return (
-          answerData.stepIndex >= stepIndex ||
-          answerData.childId !== question.id
-        );
-      });
-    });
-
-    // Remove questions with no parents
-    stepsCopy.forEach((step, stepIndex) => {
-      stepsCopy[stepIndex] = step.filter(
-        question =>
-          stepIndex === 0 ||
-          this.getParentQuestion(stepsCopy, stepIndex, question)
-      );
-    });
-
-    // Reset answer active or answer with no childs
-    stepsCopy.forEach((step, stepIndex) => {
-      step.forEach(question => {
-        question.answers.forEach(answer => {
-          if (
-            answer.id === answerData.id ||
-            (stepIndex !== stepsCopy.length - 1 &&
-              !stepsCopy[stepIndex + 1].find(
-                question => question.parent.answerColor === answerData.color
-              ))
-          ) {
-            answer.isActive = false;
-          }
-        });
-      });
-    });
-
-    if (answerData.stepIndex === 0) {
-      stepsCopy[0].forEach(question => {
-        const nextSelectedAnswer = question.answers.find(
-          answer => answer.isSelected
-        );
-
-        if (nextSelectedAnswer) {
-          answerData.questionColor = nextSelectedAnswer.color;
-        }
-      });
-    }
-
-    const filteredSteps = stepsCopy.filter(step => step.length);
-
-    this.setState({ steps: filteredSteps }, () =>
-      this.addQuestionColor(filteredSteps, answerData)
-    );
-  };
 
   toggleQuestionHeight = (stepsCopy, questionColor) => {
     this.cleanCreateQuestionItem(stepsCopy);
@@ -746,17 +1024,26 @@ class QuestionnaireTree extends Component {
         question.questionWrapperHeight =
           question.parent.answerColor === questionColor ||
           question.answers.find(
-            answer => answer.color === questionColor && answer.isSelected
+            answer => answer.color === questionColor && answer.isParent
           )
-            ? 'auto'
+            ? QUESTIONNAIRE_TREE.answerBoxDefaultHeight
             : 0;
         question.answerWrapperHeight =
           question.parent.answerColor === questionColor ||
           question.answers.find(
-            answer => answer.color === questionColor && answer.isSelected
+            answer => answer.color === questionColor && answer.isParent
           )
-            ? '200px'
+            ? QUESTIONNAIRE_TREE.answerBoxCustomHeight
             : 0;
+
+        question.answers.forEach(answer => {
+          if (answer.isParent && answer.activeCreateChild) {
+            answer.isParent = false;
+            answer.activeCreateChild = false;
+          }
+
+          answer.activeCreateChild = false;
+        });
       });
     });
 
@@ -785,7 +1072,7 @@ class QuestionnaireTree extends Component {
               question.parent.answerColor;
 
             parentQuestion.answers.forEach(answer => {
-              answer.isActive =
+              answer.isActiveAnswer =
                 answer.color === questionColor ||
                 answer.color === question.parent.answerColor;
             });
@@ -797,32 +1084,24 @@ class QuestionnaireTree extends Component {
     stepsCopy.reverse();
   };
 
-  /**
-   * event handler
-   */
-  openBranch = questionColor => {
+  openBranch = (questionColor, scrollTop) => {
     const stepsCopy = [...this.state.steps];
 
     this.toggleQuestionHeight(stepsCopy, questionColor);
 
     const filteredSteps = stepsCopy.filter(step => step.length);
 
-    this.setState({ steps: filteredSteps }, () =>
-      this.addQuestionColor(filteredSteps)
+    this.setState(
+      { steps: filteredSteps, answersWrapperScrollTop: scrollTop },
+      () => this.addQuestionColor(filteredSteps)
     );
   };
 
-  /**
-   * event handler
-   */
-  addNewQuestion = answerData => {
+  addNewQuestion = (answerData, questions) => {
     const stepsCopy = [...this.state.steps];
 
-    if (this.checkCreateQuestionChild(stepsCopy, answerData)) {
-      return;
-    }
-
-    this.cleanCreateQuestionItem(stepsCopy);
+    this.cleanCreateQuestionItem(stepsCopy, answerData);
+    this.activateAnswerOnQuestionAdd(answerData, stepsCopy);
 
     const parentQuestionTop = this.findMaxTop(
       { id: answerData.questionId },
@@ -836,7 +1115,7 @@ class QuestionnaireTree extends Component {
     );
 
     const question = {
-      type: 'create',
+      type: QUESTIONNAIRE_TREE.typeCreate,
       insertIndex: nextQuestionChildIndex,
       top:
         hasQuestionChild && parentQuestionTop
@@ -847,9 +1126,9 @@ class QuestionnaireTree extends Component {
       parent: {
         questionId: answerData.questionId,
         answerColor: answerData.color,
-        answerId: [answerData.answerId]
+        answerId: []
       },
-      id: answerData.answerId
+      stepIndex: answerData.stepIndex
     };
 
     if (answerData.stepIndex < stepsCopy.length - 1) {
@@ -866,16 +1145,37 @@ class QuestionnaireTree extends Component {
       stepsCopy.push([question]);
     }
 
+    this.fillNewQuestionAnswerIds(stepsCopy, answerData);
+
     const filteredSteps = stepsCopy.filter(step => step.length);
 
-    this.calculateQuestionTopOffset(filteredSteps);
+    this.calculateQuestionTopOffset(filteredSteps, questions, {
+      top: question.top,
+      stepIndex: question.stepIndex
+    });
   };
 
-  cleanCreateQuestionItem = stepsCopy => {
+  cleanCreateQuestionItem = (stepsCopy, answerData) => {
     stepsCopy.forEach((step, stepIndex) => {
       stepsCopy[stepIndex] = step.filter(
-        question => question.type !== 'create'
+        question => question.type !== QUESTIONNAIRE_TREE.typeCreate
       );
+    });
+
+    stepsCopy.forEach(step => {
+      step.forEach(question => {
+        if (question.answers) {
+          question.answers.forEach(answer => {
+            if (
+              !this.hasAnswerChild({ id: answer.id }, stepsCopy) &&
+              answerData &&
+              answerData.color !== answer.color
+            ) {
+              answer.isParent = false;
+            }
+          });
+        }
+      });
     });
   };
 
@@ -903,28 +1203,73 @@ class QuestionnaireTree extends Component {
     }
   };
 
-  checkCreateQuestionChild = (stepsCopy, answerData) => {
+  checkCheckBox = (answerData, steps) => {
+    let canReturn;
+
+    if (
+      answerData.type !== QUESTIONNAIRE_TREE.typeRadioButton &&
+      answerData.type !== QUESTIONNAIRE_TREE.typeRadio
+    ) {
+      const stepsCopy = steps || [...this.state.steps];
+
+      stepsCopy[answerData.stepIndex].forEach(question => {
+        if (question.id === answerData.questionId) {
+          let hasAtleastOneChild = question.answers.find(
+            answer => typeof answer.childId !== 'undefined'
+          );
+
+          if (hasAtleastOneChild) {
+            const parent = this.hasAnswerChild(
+              {
+                id: hasAtleastOneChild.id,
+                returnParent: true
+              },
+              stepsCopy
+            );
+
+            this.addQuestionToTree({
+              questionId: parent.id,
+              answerIdList: [answerData.answerId]
+            });
+
+            canReturn = true;
+          }
+        }
+      });
+    }
+
+    return canReturn;
+  };
+
+  handleExistingCreateQuestion = (answerData, steps) => {
+    const stepsCopy = steps || [...this.state.steps];
+
     let canReturn;
 
     if (stepsCopy[answerData.stepIndex + 1]) {
       stepsCopy[answerData.stepIndex + 1].forEach(question => {
         if (
-          question.type === 'create' &&
+          question.type === QUESTIONNAIRE_TREE.typeCreate &&
           answerData.color === question.parent.answerColor
         ) {
-          // const parentAnswers = stepsCopy[answerData.stepIndex][
-          //   answerData.questionIndex
-          // ].answers
-          //   .filter(answer => answer.color === question.parent.answerColor)
-          //   .map(answer => answer.id);
+          const parentAnswers = stepsCopy[answerData.stepIndex][
+            answerData.questionIndex
+          ].answers
+            .filter(
+              answer =>
+                answer.color === question.parent.answerColor && answer.isParent
+            )
+            .map(answer => answer.id);
 
-          // console.log('parentAnswers: ', parentAnswers);
-
-          // question.parent.answerId.push([...parentAnswers]);
+          question.parent.answerId = [...parentAnswers];
 
           canReturn = true;
         }
       });
+    }
+
+    if (canReturn) {
+      this.activateAnswerOnQuestionAdd(answerData, stepsCopy);
     }
 
     const filteredSteps = stepsCopy.filter(step => step.length);
@@ -934,21 +1279,71 @@ class QuestionnaireTree extends Component {
     return canReturn;
   };
 
+  fillNewQuestionAnswerIds = (stepsCopy, answerData) => {
+    if (stepsCopy[answerData.stepIndex + 1]) {
+      stepsCopy[answerData.stepIndex + 1].forEach(question => {
+        if (
+          question.type === QUESTIONNAIRE_TREE.typeCreate &&
+          answerData.color === question.parent.answerColor
+        ) {
+          const filterCondition =
+            answerData.type !== QUESTIONNAIRE_TREE.typeCheckbox &&
+            answerData.type !== QUESTIONNAIRE_TREE.typeSlider;
+          let parentAnswers;
+
+          parentAnswers = stepsCopy[answerData.stepIndex][
+            answerData.questionIndex
+          ].answers
+            .filter(
+              answer =>
+                filterCondition
+                  ? answer.color === question.parent.answerColor &&
+                    answer.isParent
+                  : answer.color === question.parent.answerColor
+            )
+            .map(answer => answer.id);
+
+          question.parent.answerId = [...parentAnswers];
+        }
+      });
+    }
+  };
+
+  activateAnswerOnQuestionAdd = (answerData, steps) => {
+    const stepsCopy = steps || [...this.state.steps];
+
+    stepsCopy.forEach(step => {
+      step.forEach(question => {
+        if (question.answers) {
+          question.answers.forEach(answer => {
+            answer.activeCreateChild =
+              answer.color === answerData.color &&
+              question.id === answerData.questionId;
+          });
+        }
+      });
+    });
+  };
+
+  showModal = questionId => {
+    this.setState({ showModal: true, clickedQuestioniId: questionId });
+  };
+
   renderSteps = () => {
     return this.state.steps.map((step, stepIndex) => {
       return (
         <QuestionStep key={idGenerator()} ref={step.ref}>
           {step.map((question, questionIndex) => {
-            return question.type !== 'create' ? (
-              <QuestionCheckboxItem
+            return question.type !== QUESTIONNAIRE_TREE.typeCreate ? (
+              <QuestionItem
                 key={idGenerator()}
                 stepIndex={stepIndex}
                 answers={question.answers}
-                txt={question.txt}
+                txt={question.questionText}
                 type={question.type}
                 checkAnswer={this.checkAnswer}
-                groupName={question.groupName}
-                groupDescription={question.groupDescription}
+                groupName={question.publicName}
+                groupDescription={question.internalName}
                 parent={question.parent}
                 questionWrapperHeight={question.questionWrapperHeight}
                 questionTop={`${question.top}px`}
@@ -958,8 +1353,13 @@ class QuestionnaireTree extends Component {
                 questionIndex={questionIndex}
                 answerWrapperHeight={question.answerWrapperHeight}
                 toggleQuestionHeight={this.openBranch}
-                addNewQuestion={this.addNewQuestion}
+                fetchQuestions={this.fetchQuestions}
+                removeAfterQuestionClick={this.showModal.bind(
+                  this,
+                  question.id
+                )}
                 ref={question.ref}
+                answersWrapperScrollTop={this.state.answersWrapperScrollTop}
               />
             ) : (
               <QuestionCreateItem
@@ -969,6 +1369,11 @@ class QuestionnaireTree extends Component {
                 questionHeight={`${question.height}px`}
                 questionIndex={questionIndex}
                 parent={question.parent}
+                questionList={this.state.questions}
+                addQuestionToTree={this.addQuestionToTree}
+                generateRandomColor={() =>
+                  this.getUniqueColor(question.branchLevel)
+                }
               />
             );
           })}
@@ -977,23 +1382,196 @@ class QuestionnaireTree extends Component {
     });
   };
 
+  closeModalOnSuccess = () => {
+    this.removeAfterQuestionClick(this.state.quesitonId);
+  };
+
+  closeModalAfterAnswerUncheck = () => {
+    const stepsCopy = [...this.state.steps];
+    stepsCopy[this.state.clickedAnswerData.stepIndex].forEach(question => {
+      question.answers.forEach(answer => {
+        if (answer.id === this.state.clickedAnswerData.id) {
+          answer.isParent = true;
+        }
+      });
+    });
+    const filteredSteps = stepsCopy.filter(step => step.length);
+    this.setState({
+      steps: [...filteredSteps],
+      showModal: false,
+      clickedQuestioniId: null,
+      clickedAnswerData: {}
+    });
+  };
+
+  getUniqueColor = (branchLevel, isAnswerRead) => {
+    const color =
+      branchLevel > 3
+        ? this.findUniqueRandomColor()
+        : this.findUniqueStepColor(branchLevel) || this.findUniqueRandomColor();
+
+    if (isAnswerRead) {
+      this.colorsUsed.push(color);
+    }
+
+    return color;
+  };
+
+  findUniqueRandomColor = () => {
+    let randomColor = colorGenerator();
+
+    if (this.colorsUsed.indexOf(randomColor) > -1) {
+      randomColor = colorGenerator();
+    }
+
+    return randomColor;
+  };
+
+  findUniqueStepColor = treeLevel => {
+    const branchColors = TREE_COLORS[`branchLevel_${treeLevel}`];
+    let branchColorIndex = 0;
+
+    while (branchColors && branchColorIndex <= branchColors.length - 1) {
+      if (this.colorsUsed.indexOf(branchColors[branchColorIndex]) === -1) {
+        return branchColors[branchColorIndex];
+      }
+
+      branchColorIndex++;
+    }
+
+    //all colors from the defined ones for that treeLevel are used
+    return undefined;
+  };
+
+  addBranchLevel = stepsCopy => {
+    stepsCopy.forEach((step, stepIndex) => {
+      step.forEach(question => {
+        if (stepIndex !== stepsCopy.length - 1) {
+          let questionBrachLevelCounter = 0;
+
+          stepsCopy[stepIndex + 1].forEach(nextQuestion => {
+            if (nextQuestion.parent.questionId === question.id) {
+              questionBrachLevelCounter++;
+              nextQuestion.branchLevel = questionBrachLevelCounter;
+            }
+          });
+        } else {
+          question.branchLevel = 1;
+        }
+
+        if (stepIndex !== 0) {
+          stepsCopy[stepIndex - 1].forEach(prevQuestion => {
+            let branchLevel;
+
+            if (prevQuestion.answers && prevQuestion.answers.length) {
+              branchLevel = prevQuestion.answers.find(answer => true)
+                .branchLevel;
+
+              question.answers.forEach(answer => {
+                if (
+                  question.type !== QUESTIONNAIRE_TREE.typeCheckbox &&
+                  question.type !== QUESTIONNAIRE_TREE.typeSlider
+                ) {
+                  answer.branchLevel = branchLevel + 1;
+                } else {
+                  answer.branchLevel = branchLevel;
+                }
+              });
+            }
+          });
+        } else {
+          question.answers.forEach(answer => {
+            if (
+              question.type !== QUESTIONNAIRE_TREE.typeCheckbox &&
+              question.type !== QUESTIONNAIRE_TREE.typeSlider
+            ) {
+              answer.branchLevel = 1;
+            } else {
+              answer.branchLevel = undefined;
+            }
+          });
+        }
+      });
+    });
+  };
+
+  scrollOnQuestionAdd = createQuestion => {
+    if (typeof createQuestion.top !== 'undefined') {
+      window.scroll({
+        top: createQuestion.top
+      });
+    }
+
+    ReactDOM.findDOMNode(this.treeRef.current).scroll({
+      left: this.treeScrollX + QUESTIONNAIRE_TREE.questionItemWidth,
+      behavior: 'smooth'
+    });
+  };
+
   render() {
-    return this.state.steps ? (
+    const proceedButton = (
+      <ActionButton
+        title={questionnaireTree.deleteQuestionModalButton}
+        type={BUTTON_TYPES.button}
+        clicked={() =>
+          (this.state.clickedQuestioniId &&
+            this.removeAfterQuestionClick(this.state.clickedQuestioniId)) ||
+          (Object.keys(this.state.clickedAnswerData).length &&
+            this.removeAfterAnswerUncheck(this.state.clickedAnswerData))
+        }
+        addClass={ACTION_BUTTON_ORANGE}
+      />
+    );
+    return this.state.isRequestExecuted &&
+      this.state.steps &&
       this.state.steps.length ? (
-        <div
-          className={classes.QuestionnaireTree}
-          style={{ height: `${this.state.treeHeight + 30}px` }}
+      <div
+        ref={this.treeRef}
+        className={classes.QuestionnaireTree}
+        style={{ height: `${this.state.treeHeight + 30}px` }}
+      >
+        <Modal
+          title={
+            this.state.clickedQuestioniId
+              ? questionnaireTree.deleteQuestionWarningTitle
+              : questionnaireTree.uncheck
+          }
+          classWidth={classes.ModalWrapper}
+          proceedButton={proceedButton}
+          afterModalClose={() =>
+            (this.state.clickedQuestioniId &&
+              this.setState({
+                showModal: false,
+                clickedQuestioniId: null,
+                clickedAnswerData: {}
+              })) ||
+            (Object.keys(this.state.clickedAnswerData).length &&
+              this.closeModalAfterAnswerUncheck())
+          }
+          show={this.state.showModal}
         >
-          {this.renderSteps()}
-        </div>
-      ) : (
-        <Fragment>
-          <QuestionCreateItem />
-          <br />
-          <br />
-          <button onClick={this.clickButton}>Click me</button>
-        </Fragment>
-      )
+          <div className={classes.Content}>
+            <div className={classes.Question}>
+              {questionnaireTree.deleteQuestionModalQuestion}
+            </div>
+            <div className={classes.AnswerWrapper}>
+              <div className={classes.AnswerTitle}>
+                {questionnaireTree.deleteQuestionModalAnswerTitle}
+              </div>
+              <div className={classes.Answer}>
+                {questionnaireTree.deleteQuestionModalAnswer}
+              </div>
+            </div>
+          </div>
+        </Modal>
+        {this.renderSteps()}
+      </div>
+    ) : this.state.isRequestExecuted ? (
+      <QuestionCreateItem
+        generateRandomColor={() => this.getUniqueColor(1)}
+        questionList={this.state.questions}
+        addQuestionToTree={this.addQuestionToTree}
+      />
     ) : (
       <Loader />
     );
@@ -1001,7 +1579,6 @@ class QuestionnaireTree extends Component {
 }
 
 export default withErrorHandler(
-  QuestionnaireTree,
-  axios,
-  QuestionnaireTree.fetchTreeModalCallback
+  withProviderConsumer(QuestionnaireTree, ['activeAdviser', 'dispatch']),
+  axios
 );

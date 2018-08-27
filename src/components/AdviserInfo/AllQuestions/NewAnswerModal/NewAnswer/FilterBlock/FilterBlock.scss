@@ -1,0 +1,25 @@
+.Wrapper {
+  padding-top: 10px;
+
+  .RemoveFilter {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .DeleteWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+
+      .Delete {
+        margin: 0;
+        width: 25px;
+        height: 25px;
+      }
+      .Text {
+        font-size: 14px;
+        color: $nbbFontDefault;
+      }
+    }
+  }
+}

@@ -1,4 +1,9 @@
-import { ADD, REMOVE, LIST_CREATE } from '../../constants/action-types';
+import {
+  ADD,
+  REMOVE,
+  LIST_CREATE,
+  ADD_ADVISOR_ID
+} from '../../constants/action-types';
 import { idGenerator } from '../../services/helpers';
 
 export const addAdviser = (title, callback) => {
@@ -35,6 +40,17 @@ export const createAdviserList = (advisers, callback) => {
 export const removeAdviser = (id, callback) => {
   return {
     type: REMOVE,
+    name: 'adviserMenu',
+    payload: {
+      id: id
+    },
+    callback: callback
+  };
+};
+
+export const addAdviserId = (id, callback) => {
+  return {
+    type: ADD_ADVISOR_ID,
     name: 'adviserMenu',
     payload: {
       id: id

@@ -1,0 +1,20 @@
+.Wrapper {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  .Button {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .Label {
+    color: $nbbFontDefault;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+  .PlusButton {
+    border: unset;
+  }
+}

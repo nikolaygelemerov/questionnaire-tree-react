@@ -1,8 +1,8 @@
 .Breadcrumbs {
   .Nav {
     position: relative;
-    margin-bottom: 2rem;
-    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-size: 12px;
 
     .Active {
       color: $nbbBlack;
@@ -10,22 +10,22 @@
     }
 
     a:not(:last-child) {
-      margin-right: 2rem;
+      margin-right: 20px;
 
       &::after {
         position: absolute;
-        top: 0.5rem;
-        content: '';
+        top: 5px;
+        content: "";
         transform: rotate(-45deg);
-        margin-left: 0.6rem;
-        padding: 0.2rem;
+        margin-left: 6px;
+        padding: 2px;
         border: solid $nbbBlack;
-        border-width: 0 0.1rem 0.1rem 0;
+        border-width: 0 1px 1px 0;
       }
     }
   }
 
   .Title {
-    font-size: 2.4rem;
+    font-size: 24px;
   }
 }

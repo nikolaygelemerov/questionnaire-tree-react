@@ -1,4 +1,9 @@
-import { ADD, REMOVE, LIST_CREATE } from '../../constants/action-types';
+import {
+  ADD,
+  REMOVE,
+  LIST_CREATE,
+  ADD_ADVISOR_ID
+} from '../../constants/action-types';
 
 export const adviserMenu = (state, action) => {
   switch (action.type) {
@@ -9,7 +14,11 @@ export const adviserMenu = (state, action) => {
         key: action.payload.key
       });
 
-      return { ...state, adviserList: adviserList };
+      return {
+        ...state,
+        adviserList: adviserList,
+        title: action.payload.title
+      };
     }
     case LIST_CREATE: {
       return {
@@ -30,6 +39,12 @@ export const adviserMenu = (state, action) => {
       adviserList.splice(removedIndex, 1);
 
       return { ...state, adviserList: adviserList };
+    }
+    case ADD_ADVISOR_ID: {
+      return {
+        ...state,
+        activeAdviser: action.payload.id
+      };
     }
     default:
       return state;

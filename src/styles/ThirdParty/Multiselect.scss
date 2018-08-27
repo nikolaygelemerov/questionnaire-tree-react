@@ -1,0 +1,126 @@
+.MultiSelect {
+  position: relative;
+  width: 100%;
+  margin: 15px 0;
+  padding: 10px 0 0 0;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid $nbbGrey;
+  outline: none;
+  font-size: 14px;
+
+  .MultiSelect__out {
+    display: none;
+  }
+
+  .MultiSelect__option {
+    background-color: $nbbOrange;
+  }
+  .MultiSelect__option--selected {
+    background-color: $nbbWhite;
+  }
+
+  .MultiSelect--multiple {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .MultiSelect--input::after {
+    display: none !important;
+  }
+
+  .MultiSelect-box__out {
+    display: none;
+  }
+
+  .MultiSelect__search {
+    display: block;
+    width: 100%;
+    border: none;
+    background: none;
+    outline: none;
+    padding: 0 10px;
+    color: $nbbFontDefault;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  .MultiSelect--multiple .MultiSelect__search {
+    box-shadow: none;
+  }
+
+  .MultiSelect--input .MultiSelect__search {
+    cursor: text;
+  }
+
+  .MultiSelect__search:focus {
+    cursor: text;
+  }
+
+  .MultiSelect__search--placeholder {
+    font-weight: normal;
+  }
+
+  .MultiSelect input::-webkit-input-placeholder {
+    color: $nbbGreyDark;
+  }
+
+  .MultiSelect input::-moz-placeholder {
+    color: $nbbGreyDark;
+  }
+
+  .MultiSelect input:-moz-placeholder {
+    color: $nbbGreyDark;
+  }
+
+  .MultiSelect input:-ms-input-placeholder {
+    color: $nbbGreyDark;
+  }
+
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+
+  .MultiSelect__select {
+    display: block;
+    height: auto;
+    max-height: 180px;
+    margin-top: 10px;
+    background: $nbbWhite;
+    overflow: auto;
+    z-index: 100;
+    border: none;
+    border-top: 1px solid $nbbGrey;
+    .MultiSelect__options {
+      height: auto;
+      max-height: 180px;
+    }
+  }
+
+  .MultiSelect__option {
+    color: $nbbFontDefault;
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
+    background-color: $nbbWhite;
+  }
+
+  .MultiSelect__option--hover,
+  .MultiSelect__option:hover {
+    background-color: $nbbGreyLight;
+  }
+
+  .MultiSelect__option--selected {
+    background-color: $nbbOrange;
+    color: $nbbWhite;
+  }
+
+  .MultiSelect__option--selected:hover,
+  .MultiSelect__option--selected.MultiSelect__option--hover {
+    background: $nbbOrange;
+  }
+}

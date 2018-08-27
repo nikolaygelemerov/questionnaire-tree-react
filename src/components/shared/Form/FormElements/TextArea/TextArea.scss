@@ -1,0 +1,48 @@
+.TextArea {
+  display: block;
+  width: 100%;
+  margin: 15px 0;
+  padding: 10px;
+  line-height: 15px;
+  color: $nbbFontDefault;
+  font-family: Roboto_Condensed;
+  font-size: 12px;
+  border: 1px solid #d9d9d9;
+  box-sizing: border-box;
+  box-shadow: none;
+  resize: none;
+  outline: none;
+
+  &:hover {
+    border-color: $nbbGreyDark;
+  }
+
+  &:focus,
+  &:active {
+    border-color: $nbbOrange;
+  }
+
+  &:disabled {
+    color: $nbbGreyDark;
+    background-color: $nbbGreyLight;
+  }
+
+  &:required:valid {
+    border-bottom: 2px solid $nbbGreen;
+  }
+  &:required:invalid {
+    border-bottom: 2px solid $nbbRed;
+  }
+}
+
+.TextArea::placeholder {
+  color: $nbbGreyDark;
+}
+
+.Error {
+  border-bottom: 3px solid $nbbRed;
+}
+
+.Valid {
+  border-bottom: 3px solid $nbbGreen;
+}

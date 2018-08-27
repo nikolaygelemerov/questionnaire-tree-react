@@ -1,5 +1,4 @@
 import { adviserMainData as translations } from '../../../translations/translations';
-
 import { FORM_ELEMENT_TYPES as formElementsConfig } from '../../../constants/constants';
 
 const mainDataState = {
@@ -9,10 +8,17 @@ const mainDataState = {
         key: 'category',
         label: translations.categoryFieldTitle,
         elementType: formElementsConfig.select,
+        nameKey: 'displayValue',
         config: {
+          placeholder: translations.answerTypeFieldPlaceholder,
           options: []
         },
-        value: ''
+        value: '',
+        errorMsg: translations.categoryRequiredErrorMsg,
+        validationRequired: true,
+        error: false,
+        touched: '',
+        required: true
       },
       {
         key: 'name',
@@ -22,7 +28,12 @@ const mainDataState = {
           type: formElementsConfig.inputTypes.text,
           placeholder: translations.nameFieldPlaceHolder
         },
-        value: ''
+        value: '',
+        error: false,
+        errorMsg: translations.nameRequiredErrorMsg,
+        validationRequired: true,
+        touched: '',
+        required: true
       },
       {
         key: 'url',
@@ -32,7 +43,22 @@ const mainDataState = {
           type: formElementsConfig.inputTypes.text,
           placeholder: translations.urlFieldPlaceHolder
         },
-        value: ''
+        value: '',
+        error: false,
+        errorMsg: translations.URLRequiredErrorMsg,
+        validationRequired: true,
+        touched: '',
+        required: true
+      },
+      {
+        key: 'image',
+        label: translations.imageFieldTitle,
+        elementType: formElementsConfig.filePicker,
+        imageName: '',
+        value: '',
+        error: false,
+        validationRequired: false,
+        tooltip: translations.uploadImageTooltip
       }
     ],
     SEO: [
@@ -44,7 +70,9 @@ const mainDataState = {
           type: formElementsConfig.inputTypes.text,
           placeholder: translations.seoFieldPlaceHolder
         },
-        value: ''
+        value: '',
+        touched: '',
+        validationRequired: false
       },
       {
         key: 'description',
@@ -53,7 +81,9 @@ const mainDataState = {
         config: {
           placeholder: translations.descriptionFieldPlaceHolder
         },
-        value: ''
+        value: '',
+        touched: '',
+        validationRequired: false
       },
       {
         key: 'index',
@@ -62,7 +92,8 @@ const mainDataState = {
         value: false,
         config: {
           type: formElementsConfig.checkbox
-        }
+        },
+        validationRequired: false
       },
       {
         key: 'follow',
@@ -71,7 +102,8 @@ const mainDataState = {
         value: false,
         config: {
           type: formElementsConfig.checkbox
-        }
+        },
+        validationRequired: false
       }
     ]
   }

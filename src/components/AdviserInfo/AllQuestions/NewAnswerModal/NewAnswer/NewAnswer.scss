@@ -1,0 +1,20 @@
+.FormWrapper {
+  border: 1px solid $nbbGrey;
+
+  .ContentTitle {
+    font-size: 20px;
+    color: $nbbOrange;
+    border-bottom: 1px solid $nbbGrey;
+    padding: 10px;
+  }
+
+  .Content {
+    padding: 10px;
+    font-size: 12px;
+
+    .QuestionType {
+      color: $nbbFontDefault;
+      font-weight: bold;
+    }
+  }
+}

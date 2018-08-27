@@ -1,0 +1,38 @@
+.ContentWrapper {
+  padding: 10px;
+  .QuestionTitle {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    font-size: 20px;
+    color: $nbbFontDark;
+  }
+
+  textarea {
+    height: 100px;
+  }
+
+  .GroupImage {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    background: url("") no-repeat center;
+    background-size: contain;
+
+    &.QuestionCheckbox {
+      background-image: url("#{$resourcePath}filter_single.svg");
+    }
+
+    &.QuestionRadio {
+      background-image: url("#{$resourcePath}subpath_single.svg");
+    }
+
+    &.QuestionSlider {
+      background-image: url("#{$resourcePath}slider_single.svg");
+    }
+  }
+}
+
+.FooterDummy {
+  height: 40px;
+}

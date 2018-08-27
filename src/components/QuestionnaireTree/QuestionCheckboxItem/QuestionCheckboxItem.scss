@@ -1,79 +1,49 @@
 .QuestionCheckboxItem {
-  position: absolute;
-  width: 400px;
+  width: 320px;
   height: auto;
-  margin: 0 0 2px 0;
-  border: none !important;
+  margin: 0 0 20px 0;
+  border: none;
   box-shadow: none;
-  background-color: transparent;
 
   .BorderTop {
-    width: 320px;
+    width: 100%;
     height: 4px;
   }
 
   .QuestionContent {
+    border: 1px solid $nbbGreySemiDark;
     border-top: none;
 
     .QuestionGroupName {
       display: flex;
       align-items: center;
-      width: 320px;
       height: 40px;
       padding-left: 5px;
       color: $nbbFontDark;
       font-size: 16px;
-      border: 1px solid $nbbGreySemiDark;
-      border-bottom: none;
-      background-color: $nbbWhite;
+      border-bottom: 1px solid $nbbGreySemiDark;
 
       .GroupImage {
         width: 30px;
         height: 90%;
         margin-right: 5px;
-        background: url("../../../assets/images/Willow_branch_detail.png")
-          no-repeat center;
-        background-size: contain;
       }
     }
 
     .GroupDescription {
-      width: 320px;
       padding: 7px 7px 7px 10px;
       color: $nbbFontDefault;
       font-size: 14px;
       font-weight: 700;
-      border: 1px solid $nbbGreySemiDark;
       background-color: $nbbGreyLight;
       overflow: hidden;
     }
 
-    .QuestionsWrapper {
-      height: 0;
-      overflow: auto;
-
-      .AnswersWrapper {
-        height: 0;
-        overflow-y: auto;
-
-        .AnswerMock {
-          width: 320px;
-          height: 50px;
-          border: 1px solid $nbbGreySemiDark;
-          border-top: none;
-          background-color: $nbbWhite;
-        }
-      }
-
-      .QuesstionText {
-        width: 320px;
-        padding: 7px 7px 7px 10px;
-        color: $nbbFontDark;
-        font-size: 14px;
-        border: 1px solid $nbbGreySemiDark;
-        border-top: none;
-        background-color: $nbbWhite;
-      }
+    .QuesstionText {
+      padding: 7px 7px 7px 10px;
+      color: $nbbFontDark;
+      font-size: 14px;
+      overflow: hidden;
     }
   }
 }

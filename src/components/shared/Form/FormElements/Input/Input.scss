@@ -1,0 +1,68 @@
+.Input {
+  width: 100% !important;
+  height: 38px !important;
+  margin: 15px 0 !important;
+  padding: 0 10px !important;
+  color: $nbbFontDefault;
+  font-size: 14px;
+  border: 1px solid $nbbGrey !important;
+  box-shadow: none;
+  outline: none;
+
+  &:hover {
+    border-color: $nbbGreyDark;
+  }
+
+  &:hover:disabled {
+    border-color: $nbbGrey;
+  }
+
+  &:disabled {
+    color: $nbbGreyDark;
+    background-color: $nbbGreyLight;
+    box-shadow: none;
+    outline: none;
+  }
+
+  &:hover {
+    border-color: $nbbGreyDark;
+  }
+
+  &:hover:disabled {
+    border-color: $nbbGrey;
+  }
+
+  &:disabled {
+    color: $nbbGreyDark;
+    background-color: $nbbGreyLight;
+    box-shadow: none;
+  }
+
+  &:focus {
+    border: 1px solid $nbbOrange;
+  }
+
+  &:required:valid {
+    border-bottom: 2px solid $nbbGreen;
+  }
+
+  &:required:invalid {
+    border-bottom: 2px solid $nbbRed;
+  }
+}
+
+.Input::placeholder {
+  color: $nbbGreyDark;
+}
+
+.Input[type="checkbox"] {
+  width: initial;
+}
+
+.Error {
+  border-bottom: 3px solid $nbbRed;
+}
+
+.Valid {
+  border-bottom: 3px solid $nbbGreen;
+}

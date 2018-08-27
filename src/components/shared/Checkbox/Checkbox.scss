@@ -1,9 +1,9 @@
 .Checkbox {
   position: relative;
   display: inline-block;
-  width: 3.5rem;
-  height: 2.5rem;
-  margin: 1rem;
+  width: 37px;
+  height: 25px;
+  margin: 10px;
 
   input {
     display: none;
@@ -14,21 +14,25 @@
   }
 
   input:focus + .Slider {
-    box-shadow: 0 0 0.1rem $nbbOrange;
+    box-shadow: 0 0 1px $nbbOrange;
   }
 
   input:checked + .Slider .CircleWrapper {
-    transform: translateX(1.1rem);
+    transform: translateX(11px);
 
     .Circle {
-      background-image: url('../../../assets/icons/nbb_check_orange.svg');
+      background-image: url("#{$resourcePath}nbb_check_orange.svg");
       background-size: 70% 70%;
+
+      &:hover {
+        background-image: url("#{$resourcePath}nbb_check_pos.svg");
+      }
     }
   }
 
   .Slider {
     position: absolute;
-    top: 0.1rem;
+    top: 1px;
     right: 0;
     bottom: 0;
     left: 0;
@@ -41,9 +45,9 @@
 
     .CircleWrapper {
       position: absolute;
-      left: 0.2rem;
-      height: 2rem;
-      width: 2rem;
+      left: 2px;
+      height: 22px;
+      width: 22px;
       background-color: $nbbWhite;
       border-radius: 50%;
       transition: 0.4s;
@@ -51,13 +55,17 @@
       .Circle {
         width: 100%;
         height: 100%;
-        background: url('../../../assets/icons/nbb_close.svg') no-repeat center;
+        background: url("#{$resourcePath}nbb_close.svg") no-repeat center;
         background-size: contain;
+
+        &:hover {
+          background-image: url("#{$resourcePath}nbb_close_orange.svg");
+        }
       }
     }
 
     &.Round {
-      border-radius: 2.2rem;
+      border-radius: 22px;
     }
   }
 }

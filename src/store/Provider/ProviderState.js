@@ -1,3 +1,6 @@
 export default {
-  adviserList: []
+  adviserList: [],
+  activeAdviser: '',
+  isFormEdited: '',
+  showPromptModal: ''
 };

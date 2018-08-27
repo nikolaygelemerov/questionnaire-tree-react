@@ -1,0 +1,150 @@
+.Answer {
+  height: auto;
+
+  .AnswerTextWrapper {
+    position: relative;
+    border: none;
+    background-color: $nbbWhite;
+
+    .AnswerTextContent {
+      position: relative;
+      z-index: 2;
+      margin-left: 40px;
+
+      .AnswerText {
+        display: flex;
+        align-items: center;
+        min-height: 50px;
+        padding: 10px 0;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .InputCheckbox {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 15px;
+    left: 0;
+    user-select: none;
+
+    .Checkmark {
+      position: absolute;
+      cursor: default;
+      width: 20px;
+      height: 20px;
+      top: 0;
+      left: 0;
+      background: $nbbWhite;
+      border: 1px solid $nbbGreySemiDark;
+
+      &:after {
+        opacity: 0;
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+        -ms-transform: translate(-50%, -50%) rotate(-45deg);
+        transform: translate(-50%, -69%) rotate(-45deg);
+        width: 11px;
+        height: 5px;
+        background: transparent;
+        border: 2px solid $nbbOrange;
+        border-top: none;
+        border-right: none;
+      }
+    }
+
+    input {
+      display: none;
+    }
+  }
+
+  .InputRadio {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 15px;
+    left: 0;
+    user-select: none;
+
+    input {
+      display: none;
+    }
+
+    .Checkmark {
+      cursor: default;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      border: 1px solid $nbbGreySemiDark;
+      background: none;
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70%;
+        height: 70%;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.Slider {
+  .SliderLine {
+    margin: 20px 0;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 1px;
+    background-color: $nbbFontDefault;
+
+    .SliderCircle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid $nbbOrange;
+      background-color: $nbbWhite;
+    }
+
+    .AnswerTextWrapper {
+      display: none;
+    }
+  }
+
+  .TextsWrapper {
+    position: relative;
+    .Text {
+      display: inline-block;
+      width: calc(50% - 10px);
+      margin-right: 10px;
+      word-break: break-all;
+
+      .MinSliderValue {
+        text-align: left;
+        margin-top: 10px;
+        font-size: 14px;
+        color: $nbbFontDefault;
+      }
+      .MaxSliderValue {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 14px;
+        color: $nbbFontDefault;
+      }
+    }
+  }
+}

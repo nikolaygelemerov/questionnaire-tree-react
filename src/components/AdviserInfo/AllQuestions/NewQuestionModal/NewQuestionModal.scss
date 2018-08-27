@@ -1,0 +1,50 @@
+.SaveButton {
+  width: 135px;
+}
+
+.ModalWrapper {
+  width: 800px;
+}
+
+.DeleteWrapper {
+  display: inline-block;
+  cursor: pointer;
+  width: 85%;
+
+  .Delete {
+    float: right;
+    margin: 0;
+    width: 25px;
+    height: 25px;
+  }
+
+  .Text {
+    float: right;
+    height: 25px;
+    font-size: 14px;
+    color: $nbbFontDefault;
+    padding-top: 6px;
+  }
+
+  .Disable {
+    opacity: 0.6;
+    pointer-events: none !important;
+  }
+
+  .PartOfTreeWrapper {
+    display: inline-block;
+    width: 40%;
+    margin-left: 30%;
+  }
+
+  .PartOfTreeLabel {
+    font-size: 14px;
+  }
+
+  .GoToTree {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 14px;
+    text-decoration: underline;
+  }
+}

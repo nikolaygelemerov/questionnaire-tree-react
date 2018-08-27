@@ -4,7 +4,7 @@ import Modal from '../../components/shared/Modal/Modal';
 import classes from './withErrorHandler.scss';
 import { common } from '../../translations/translations';
 
-const withErrorHandler = (WrappedComponent, axios, modalCallback) => {
+const withErrorHandler = (WrappedComponent, axios) => {
   return class extends Component {
     constructor(props) {
       super(props);
@@ -13,11 +13,17 @@ const withErrorHandler = (WrappedComponent, axios, modalCallback) => {
         error: null,
         errorMsg: '',
         requestInterceptor: null,
-        responseInterceptor: null
+        responseInterceptor: null,
+        showModal: false,
+        errorCallback: null
       };
 
       this.requestInterceptor = axios.interceptors.request.use(req => {
-        this.setState({ error: '', errorMsg: req.errorMsg });
+        this.setState({
+          error: '',
+          errorMsg: req.errorMsg,
+          errorCallback: req.errorCallback
+        });
 
         return req;
       });
@@ -26,7 +32,11 @@ const withErrorHandler = (WrappedComponent, axios, modalCallback) => {
         res => Promise.resolve(res),
         error => {
           const errorMsg = this.state.errorMsg;
-          this.setState({ error: error, errorMsg: errorMsg || error.message });
+          this.setState({
+            error: error,
+            errorMsg: errorMsg || error.message,
+            showModal: true
+          });
 
           return Promise.reject(error);
         }
@@ -48,10 +58,11 @@ const withErrorHandler = (WrappedComponent, axios, modalCallback) => {
           {this.state.error && (
             <Modal
               title={common.error}
-              show={true}
-              hideBtn={true}
+              show={this.state.showModal}
+              buttons={null}
               afterModalClose={() => {
-                modalCallback && modalCallback(this.props.history);
+                this.state.errorCallback && this.state.errorCallback();
+                this.setState({ showModal: false });
               }}
             >
               <div className={classes.ErrorContent}>{this.state.errorMsg}</div>

@@ -1,0 +1,109 @@
+.QuestionCardContainer {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: top;
+  width: 280px;
+  height: 400px;
+  margin: 10px 20px 0 0;
+  background-color: $nbbWhite;
+  box-shadow: 0 3px 4.7px 0.3px $nbbGreyDark;
+
+  .QuestionGroupName {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    color: $nbbOrange;
+    font-size: 18px;
+    border-bottom: 1px solid $nbbGreySemiDark;
+
+    .QuestionTitleWrapper {
+      display: flex;
+      align-items: center;
+
+      .GroupImage {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+        background: url("") no-repeat center;
+        background-size: contain;
+
+        &.QuestionCheckbox {
+          background-image: url("#{$resourcePath}filter_single.svg");
+        }
+
+        &.QuestionRadio {
+          background-image: url("#{$resourcePath}subpath_single.svg");
+        }
+
+        &.QuestionSlider {
+          background-image: url("#{$resourcePath}slider_single.svg");
+        }
+      }
+      .GroupTitle {
+        font-size: 16px;
+      }
+    }
+
+    .GroupButton {
+      height: 20px;
+      width: 20px;
+      margin: 0;
+    }
+  }
+
+  .GroupDescription {
+    padding: 8px 10px;
+    color: $nbbFontDefault;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: $nbbGreyLight;
+  }
+
+  .FooterWrapper {
+    margin-top: auto;
+  }
+  .ToggleWrapper {
+    padding: 10px;
+    font-size: 14px;
+
+    .NoFilters {
+      color: $nbbFontDefault;
+      font-weight: bold;
+    }
+
+    &.Active {
+      height: 240px;
+    }
+
+    &.FilterToggler {
+      border-top: 1px solid $nbbGrey;
+    }
+  }
+
+  .EditAnswersContainer {
+    padding: 12px 10px;
+    border-top: 1px solid $nbbGrey;
+
+    &.ClearPadding {
+      padding: 0 10px;
+    }
+
+    a {
+      font-size: 14px;
+      color: $nbbFontLight;
+      text-decoration: underline;
+      cursor: pointer;
+
+      &:hover,
+      &:active,
+      &:visited {
+        color: $nbbFontLight;
+      }
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}

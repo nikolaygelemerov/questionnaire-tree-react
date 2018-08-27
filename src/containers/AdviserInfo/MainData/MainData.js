@@ -1,57 +1,93 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 
 import classes from './MainData.scss';
 import MainDataBlock from '../../../components/AdviserInfo/MainDataBlock/MainDataBlock';
 import * as actionCreators from '../../../store/actions/index';
 import mainDataState from './MainDataState';
-import { mainDataBlocks, common } from '../../../translations/translations';
+import {
+  mainDataBlocks,
+  common,
+  adviserMainData
+} from '../../../translations/translations';
 import ActionButton from '../../../components/shared/ActionButton/ActionButton';
 import Loader from '../../../components/shared/Loader/Loader';
+import InfoMessage from '../../../components/shared/InfoMessage/InfoMessage';
 import {
   ACTION_BUTTON_WHITE,
   ACTION_BUTTON_ORANGE,
-  BUTTON_TYPES
+  BUTTON_TYPES,
+  FORM_ELEMENT_TYPES,
+  IMAGE_KEY,
+  IMAGE_ERROR_KEY,
+  INITIAL_BASIS_DATA
 } from '../../../constants/constants';
-import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../../services/axios';
 import withProviderConsumer from '../../../hoc/withProviderConsumer/withProviderConsumer';
-import URLS from '../../../constants/urls';
+import ROUTES from '../../../constants/urls';
+import { ADVISOR } from '../../../constants/backendUrls';
+import Form from '../../../components/shared/Form/Form';
+import Modal from '../../../components/shared/Modal/Modal';
 
-const translations = { ...mainDataBlocks, ...common };
+const translations = { ...mainDataBlocks, ...common, ...adviserMainData };
+const URLS = { ...ROUTES, ...ADVISOR };
 
-class MainData extends PureComponent {
+class MainData extends Form {
+  constructor(props) {
+    super(props);
+    this.form = React.createRef();
+  }
   state = {
     ...mainDataState,
     id: '',
-    isEditedDataFetched: false
+    isEditedDataFetched: false,
+    showMsg: false,
+    infoMsg: {
+      success: false,
+      title: '',
+      content: ''
+    },
+    isFormEdited: false,
+    editableElements: []
   };
 
   componentDidMount() {
     window.scrollTo(0, 0);
     this.addCategories();
-    if (this.props.edit) {
-      const location = window.location.pathname.split('/');
-      this.getAdviser(location[location.length - 1]);
+    this.props.dispatch(
+      actionCreators.addAdviserId(this.props.match.params.id)
+    );
+    this.checkForEditableBerater();
+  }
+
+  componentDidUpdate(prevProp, prevState) {
+    if (prevState.isFormEdited !== this.state.isFormEdited) {
+      this.props.dispatch(
+        actionCreators.checkForEditedForm(this.state.isFormEdited)
+      );
+    }
+
+    if (prevProp.activeAdviser !== this.props.activeAdviser) {
+      this.checkForEditableBerater();
+    }
+  }
+
+  checkForEditableBerater() {
+    if (this.props.activeAdviser) {
+      const id = this.props.activeAdviser;
+      this.getAdviser(id);
       this.setState(() => {
-        return { id: location[location.length - 1] };
+        return { id };
       });
     }
-    if (!this.props.edit) {
-      const initialFormData = {
-        name: '',
-        category: 1,
-        url: '',
-        title: '',
-        description: '',
-        index: false,
-        follow: false
-      };
+    if (!this.props.activeAdviser) {
       const newState = { ...this.state.formFields };
       Object.keys(newState).forEach(fieldName => {
         newState[fieldName].forEach((field, index) => {
-          field.value = initialFormData[field.key];
+          if (field.key === IMAGE_KEY) {
+            field.imageName = INITIAL_BASIS_DATA[field.key];
+          }
+          field.value = INITIAL_BASIS_DATA[field.key];
         });
       });
       this.setState(() => {
@@ -62,34 +98,50 @@ class MainData extends PureComponent {
     }
   }
 
-  componentWillUnmount() {
-    window.scrollTo(0, 0);
-  }
+  onAfterSubmit = sendData => {
+    this.addAdviser(sendData);
+  };
 
-  formElementChangedHandler = (event, elementIdentifier, blockIdentifier) => {
-    const updatedFormData = {
-      ...this.state.formFields
-    };
-    const blockUpdated = [...updatedFormData[blockIdentifier]];
-    const originalElInd = blockUpdated.findIndex(
-      element => element.key === elementIdentifier
-    );
-    const originalElement = blockUpdated[originalElInd];
-    const elementChanged = { ...originalElement };
-
-    elementChanged.value =
-      elementChanged.elementType === BUTTON_TYPES.checkbox
-        ? !elementChanged.value
-        : event.target.value;
-    blockUpdated[originalElInd] = elementChanged;
-    updatedFormData[blockIdentifier] = blockUpdated;
-
-    this.setState({ formFields: updatedFormData });
+  handleError = (error, title) => {
+    this.setState(prevState => {
+      const newInfoMsg = {
+        success: false,
+        title: title || 'Error',
+        content: error.response.data.errors
+      };
+      if (
+        error.response.data.errors.find(
+          el => el.indexOf(IMAGE_ERROR_KEY) !== -1
+        )
+      ) {
+        const newFormData = { ...this.state.formFields };
+        const newBasisData = [...newFormData.basisData];
+        newBasisData.forEach(element => {
+          if (element.key === IMAGE_KEY) {
+            element.imageName = '';
+            element.value = '';
+          }
+        });
+        newFormData.basisData = [...newBasisData];
+        return {
+          ...prevState,
+          showMsg: true,
+          infoMsg: { ...newInfoMsg },
+          formFields: newFormData
+        };
+      } else {
+        return {
+          ...prevState,
+          showMsg: true,
+          infoMsg: { ...newInfoMsg }
+        };
+      }
+    });
   };
 
   addCategories = async () => {
     try {
-      const response = await axios.get('/admin/advisor/categories', {
+      const response = await axios.get(URLS.get.categories, {
         params: {},
         errorMsg: translations.addCategoryErrorMsg
       });
@@ -104,7 +156,7 @@ class MainData extends PureComponent {
         };
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -116,24 +168,26 @@ class MainData extends PureComponent {
       seoTitle: formData.title,
       seoDescription: formData.description,
       seoIsIndex: formData.index,
-      seoFollow: formData.follow
+      seoFollow: formData.follow,
+      image: formData.image || ''
     };
     try {
-      await axios.post(
-        '/admin/advisor',
+      const response = await axios.post(
+        URLS.post.create,
         { ...advisorData },
         { errorMsg: translations.addAdviserErrorMsg }
       );
-      if (formData.name) {
+      if (response.data) {
         this.props.dispatch(
           actionCreators.addAdviser(
             formData.name,
-            this.navigateToSwitch.bind(this)
+            this.navigateToSwitch.bind(this, URLS.root)
           )
         );
       }
     } catch (error) {
       console.error(error);
+      this.handleError(error, translations.errorMessageTitle);
     }
   };
   editAdviser = async (id, adviser) => {
@@ -144,19 +198,26 @@ class MainData extends PureComponent {
       seoTitle: adviser.title,
       seoDescription: adviser.description,
       seoIsIndex: adviser.index,
-      seoFollow: adviser.follow
+      seoFollow: adviser.follow,
+      image: adviser.image || ''
     };
+
     try {
       await axios.put(
-        `/admin/advisor/${id}`,
+        `${URLS.put.edit.advisor}${id}`,
         { ...advisorData },
         {
           errorMsg: translations.editAdvisorErrorMsg
         }
       );
-      this.navigateToSwitch();
+      this.navigateToSwitch(
+        this.props.showPromptModal !== ''
+          ? this.props.showPromptModal
+          : URLS.root
+      );
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      this.handleError(error, translations.errorMessageOnRquestFailed);
     }
   };
   getAdviser = async id => {
@@ -164,7 +225,7 @@ class MainData extends PureComponent {
       let newFormData;
       await axios
         .get(
-          `/admin/advisor/${id}`,
+          `${URLS.get.advisor}${id}`,
           {},
           { errorMsg: translations.getAdviserErrorMsg }
         )
@@ -177,7 +238,8 @@ class MainData extends PureComponent {
             title: advisorData.seoTitle,
             description: advisorData.seoDescription,
             index: advisorData.seoIsIndex,
-            follow: advisorData.seoFollow
+            follow: advisorData.seoFollow,
+            image: advisorData.image
           };
         });
       this.setState(() => {
@@ -185,39 +247,107 @@ class MainData extends PureComponent {
         Object.keys(newState).forEach(fieldName => {
           newState[fieldName].forEach((field, index) => {
             field.value = newFormData[field.key];
+            if (field.elementType === FORM_ELEMENT_TYPES.filePicker) {
+              field.imageName = newFormData[field.key];
+            }
           });
         });
         return {
           formFields: { ...newState },
-          isEditedDataFetched: true
+          isEditedDataFetched: true,
+          initialState: { ...newFormData }
         };
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      this.handleError(error, translations.errorMessageOnRquestFailed);
     }
   };
 
-  navigateToSwitch = () => this.props.history.push(URLS.root);
+  navigateToSwitch = URL => {
+    this.props.history.push(URL);
+  };
 
   submitFormHandler = (event, dispatch) => {
     event.preventDefault();
-
     const formData = {};
-
     Object.keys(this.state.formFields).forEach(fieldName => {
       this.state.formFields[fieldName].forEach((field, index) => {
         formData[field.key] = field.value;
       });
     });
-    this.props.edit
+
+    this.state.id
       ? this.editAdviser(this.state.id, formData)
       : this.addAdviser(formData);
+  };
+
+  onPromptModalClose = event => {
+    if (event.target.type === BUTTON_TYPES.submit) {
+      this.props.dispatch(actionCreators.showPromptModal(''));
+      this.props.dispatch(actionCreators.checkForEditedForm(false));
+    } else {
+      this.props.dispatch(actionCreators.showPromptModal(''));
+    }
+  };
+
+  warningButtonSubmit = sendData => {
+    this.submitFormHandler(sendData);
+    this.onPromptModalClose({ target: { type: BUTTON_TYPES.submit } });
+  };
+
+  proceedWithoutSave = () => {
+    this.props.dispatch(actionCreators.showPromptModal(''));
+    this.props.dispatch(actionCreators.checkForEditedForm(false));
+  };
+
+  cancelAndNavToSwitch = () => {
+    this.props.dispatch(actionCreators.showPromptModal(URLS.root));
   };
 
   render() {
     const content = (
       <div className={classes.MainData}>
-        <form onSubmit={e => this.submitFormHandler(e)}>
+        {this.state.showMsg ? (
+          <InfoMessage
+            success={this.state.infoMsg.success}
+            infoMsg={{
+              success: this.state.infoMsg.success,
+              title: this.state.infoMsg.title,
+              details: this.state.infoMsg.content
+            }}
+          />
+        ) : null}
+
+        <Form
+          onFormSubmit={this.submitFormHandler}
+          onAfterSubmit={this.onAfterSubmit}
+          ref={this.form}
+        >
+          {this.state.isFormEdited && this.props.showPromptModal ? (
+            <Modal
+              title={adviserMainData.promptModalTitle}
+              classWidth={classes.ModalWrapper}
+              proceedButton={
+                <ActionButton
+                  title={translations.saveButtonLabel}
+                  type={BUTTON_TYPES.submit}
+                  navigateTo={true}
+                  clicked={this.warningButtonSubmit}
+                  route={this.props.showPromptModal}
+                  addClass={ACTION_BUTTON_ORANGE}
+                />
+              }
+              withoutSaveRoute={this.props.showPromptModal}
+              afterModalClose={this.onPromptModalClose}
+              show={this.props.showPromptModal}
+              proceedWithoutSave={this.proceedWithoutSave}
+            >
+              <span className={classes.WarningMessageContent}>
+                {translations.promptModalContent}
+              </span>
+            </Modal>
+          ) : null}
           <MainDataBlock
             title={translations.baseDataBlockTitle}
             secondaryTitle={translations.baseDataBlockSecondaryTitle}
@@ -235,8 +365,10 @@ class MainData extends PureComponent {
             <div className={classes.Cancel}>
               <ActionButton
                 title={translations.cancel}
-                navigateTo={true}
-                route={URLS.root}
+                type={BUTTON_TYPES.button}
+                clicked={this.cancelAndNavToSwitch}
+                navigateTo={!this.state.isFormEdited}
+                route={this.props.showPromptModal || URLS.root}
                 addClass={ACTION_BUTTON_WHITE}
               />
             </div>
@@ -248,7 +380,7 @@ class MainData extends PureComponent {
               />
             </div>
           </div>
-        </form>
+        </Form>
       </div>
     );
     return this.state.isEditedDataFetched || !this.props.edit ? (
@@ -263,6 +395,8 @@ MainData.propTypes = {
   dispatch: PropTypes.func
 };
 
-export default withRouter(
-  withErrorHandler(withProviderConsumer(MainData, ['dispatch']), axios)
-);
+export default withProviderConsumer(MainData, [
+  'activeAdviser',
+  'dispatch',
+  'showPromptModal'
+]);

@@ -1,0 +1,65 @@
+.Wrapper {
+  border: 1px solid $nbbGrey;
+  .Header {
+    display: flex;
+    align-items: center;
+    padding: 10px 10px;
+    border-bottom: 1px solid $nbbGrey;
+    .HeaderImage {
+      width: 20px;
+      height: 20px;
+      background: url("#{$resourcePath}nbb_error_warning.svg") no-repeat;
+      background-size: contain;
+
+      &:hover {
+        background: url("#{$resourcePath}nbb_error_orange.svg") no-repeat;
+        background-size: contain;
+      }
+    }
+
+    .HeaderText {
+      margin-left: 10px;
+      font-size: 20px;
+      color: $nbbFontDark;
+    }
+  }
+
+  .Content {
+    padding: 10px;
+    border-bottom: 1px solid $nbbGrey;
+    color: $nbbFontDefault;
+    font-size: 12px;
+    .Question {
+    }
+
+    .AnswerWrapper {
+      display: flex;
+      align-items: center;
+      .AnswerTitle {
+        font-weight: bold;
+      }
+
+      .Answer {
+        margin-left: 5px;
+      }
+      .Link {
+        margin-left: 10px;
+        text-decoration: underline;
+        color: $nbbFontLight;
+      }
+    }
+  }
+
+  .Footer {
+    padding: 10px;
+
+    .Cancel {
+      display: inline-block;
+      width: 120px;
+    }
+
+    .Proceed {
+      float: right;
+    }
+  }
+}

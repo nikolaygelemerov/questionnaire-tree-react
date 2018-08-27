@@ -1,0 +1,26 @@
+.FilePicker {
+  display: flex;
+  align-items: center;
+
+  .Wrapper {
+    display: inline-block;
+  }
+
+  .AddButton {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .AddLabel,
+  .ImageName {
+    display: inline-block;
+    font-size: 14px;
+    color: $nbbFontDefault;
+  }
+
+  .AddLabel {
+    margin-left: 10px;
+  }
+}

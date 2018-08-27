@@ -2,76 +2,108 @@ import React from 'react';
 
 import classes from './Answer.scss';
 import PlusButton from '../../shared/PlusButton/PlusButton';
+import { QUESTIONNAIRE_TREE } from '../../../constants/constants';
 
 const Answer = props => {
-  const inputType = props.type;
   const inputClass =
-    props.type === 'checkbox' ? classes.InputCheckbox : classes.InputRadio;
+    props.type === QUESTIONNAIRE_TREE.typeCheckbox
+      ? classes.InputCheckbox
+      : classes.InputRadio;
+
+  const displayArrow = props.isParent && !props.canCreate;
+  const displayPlus =
+    (props.isParent && props.canCreate) ||
+    (!props.isParent &&
+      (props.type === QUESTIONNAIRE_TREE.typeSlider ||
+        props.type === QUESTIONNAIRE_TREE.typeCheckbox));
+
   return (
     <div className={classes.Answer}>
-      <div
-        className={classes.AnswerTextWrapper}
-        style={{
-          borderRight: props.isSelected
-            ? `4px solid ${props.color}`
-            : '1px solid #d9d9d9'
-        }}
-      >
-        <label className={inputClass}>
+      <div className={classes.AnswerTextWrapper}>
+        <label
+          className={inputClass}
+          style={{
+            display:
+              props.type !== QUESTIONNAIRE_TREE.typeSlider ? 'block' : 'none'
+          }}
+        >
           <input
-            disabled={false}
+            disabled={props.type === QUESTIONNAIRE_TREE.typeCheckbox}
             type="checkbox"
-            onChange={() =>
-              props.checkAnswer(
-                props.stepIndex,
-                props.questionId,
-                props.answerId
-              )
+            onChange={props.checkAnswer}
+            checked={
+              props.isParent && props.type !== QUESTIONNAIRE_TREE.typeCheckbox
             }
-            checked={props.isSelected}
           />
           <span className={classes.Checkmark} />
         </label>
-      </div>
-      {props.isSelected &&
-        !props.canCreate && (
-          <div className={classes.AnswerArrowWrapper}>
-            <div
-              className={classes.AnswerArrow}
+        <div
+          className={classes.AnswerTextContent}
+          style={{
+            borderRight:
+              props.isParent && props.type !== QUESTIONNAIRE_TREE.typeSlider
+                ? `4px solid ${props.color}`
+                : `1px solid ${QUESTIONNAIRE_TREE.defaultBorderColor}`
+          }}
+        >
+          <div className={classes.AnswerText}>
+            <span
               style={{
-                borderColor: `${props.color}`,
-                backgroundColor: props.isActive ? `${props.color}` : 'none'
+                display:
+                  props.type !== QUESTIONNAIRE_TREE.typeSlider
+                    ? 'block'
+                    : 'none'
               }}
-              onClick={() => props.toggleQuestionHeight(props.color)}
             >
-              <div className={classes.ArrowWrapper}>
-                <span
-                  className={classes.Arrow}
-                  style={{
-                    borderColor: props.isActive ? '#f6f6f6' : `${props.color}`
-                  }}
+              {props.answer || 'Answer text here...'}
+            </span>
+            {displayArrow && (
+              <div
+                className={classes.AnswerArrow}
+                style={{
+                  borderColor: props.color,
+                  backgroundColor: props.isActiveAnswer ? props.color : 'none'
+                }}
+                onClick={props.toggleQuestionHeight}
+              >
+                <div className={classes.ArrowWrapper}>
+                  <span
+                    className={classes.Arrow}
+                    style={{
+                      borderColor: props.isActiveAnswer
+                        ? QUESTIONNAIRE_TREE.activeAnswerBorderColor
+                        : props.color
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+            {displayPlus && (
+              <div
+                className={classes.AnswerArrow}
+                style={{
+                  border: 'none'
+                }}
+                onClick={() => props.fetchQuestions({ ...props })}
+              >
+                <PlusButton
+                  borderColor={props.color}
+                  backgroundColor={`${
+                    props.activeCreateChild
+                      ? props.color
+                      : QUESTIONNAIRE_TREE.inactiveBackgroundColor
+                  }`}
+                  elementColor={`${
+                    props.activeCreateChild
+                      ? QUESTIONNAIRE_TREE.activeAnswerBorderColor
+                      : props.color
+                  }`}
                 />
               </div>
-            </div>
+            )}
           </div>
-        )}
-      {props.isSelected &&
-        props.canCreate && (
-          <div className={classes.AnswerArrowWrapper}>
-            <div
-              className={classes.AnswerArrow}
-              style={{
-                borderColor: `${props.color}`
-              }}
-              onClick={() => props.addNewQuestion({ ...props })}
-            >
-              <PlusButton
-                backgroundColor={'transparent'}
-                elementColor={props.color}
-              />
-            </div>
-          </div>
-        )}
+        </div>
+      </div>
     </div>
   );
 };

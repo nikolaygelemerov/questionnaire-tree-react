@@ -1,28 +1,29 @@
 .NavBar {
   position: fixed;
-  top: 12rem;
-  z-index: 1;
+  top: 150px;
+  z-index: 800;
   display: block;
   width: 100%;
   background-color: $nbbWhite;
-  box-shadow: 0 0.3rem 0.47rem 0.03rem $nbbGreyDark;
+  box-shadow: 0 3px 4.7px 0.3px $nbbGreyDark;
 
   a {
     display: inline-block;
-    width: 12rem;
-    height: 4rem;
-    line-height: 4rem;
+    width: 120px;
+    height: 40px;
+    line-height: 40px;
     color: $nbbFontDefault;
-    font-size: 1.5rem;
+    font-size: 15px;
     font-weight: bold;
     text-align: center;
     text-decoration: none;
+    cursor: pointer;
 
     @extend .ThemeRemoveFocus;
   }
 
   .Active {
     color: $nbbOrange;
-    border-bottom: 0.2rem solid $nbbOrange;
+    border-bottom: 2px solid $nbbOrange;
   }
 }

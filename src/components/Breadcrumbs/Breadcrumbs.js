@@ -3,8 +3,9 @@ import { NavLink } from 'react-router-dom';
 
 import classes from './Breadcrumbs.scss';
 import URLS from '../../constants/urls';
-import { idGenerator } from '../../helpers/helpers';
+import { idGenerator } from '../../services/helpers';
 import { breadcrumbs as translations } from '../../translations/translations';
+import withProviderConsumer from '../../hoc/withProviderConsumer/withProviderConsumer';
 
 const urlMap = url => {
   switch (url) {
@@ -34,29 +35,43 @@ const splitUrl = url => {
 const Breadcrumbs = props => {
   let url = '';
   let title = '';
+  let breadcrumbsUrl = '';
+  let breadcrumbsTitle = '';
+  let mainTitle = '';
 
   const routeList = splitUrl(props.pathname).map((element, index) => {
     url += (index === 1 ? '' : '/') + element;
     title = urlMap(url);
 
-    return (
+    if (index !== 0 && props.activeAdviser) {
+      breadcrumbsUrl = `${url}/${props.activeAdviser}`;
+    } else {
+      breadcrumbsUrl = url;
+    }
+
+    if (title) {
+      breadcrumbsTitle = title;
+      mainTitle = `${title} ${props.activeAdviser ? props.activeAdviser : ''}`;
+    }
+
+    return title ? (
       <NavLink
         activeClassName={classes.Active}
         exact
         key={idGenerator()}
-        to={url}
+        to={breadcrumbsUrl}
       >
-        {title}
+        {breadcrumbsTitle}
       </NavLink>
-    );
+    ) : null;
   });
 
   return (
     <div className={classes.Breadcrumbs}>
       <div className={classes.Nav}>{routeList}</div>
-      <div className={classes.Title}>{title}</div>
+      <div className={classes.Title}>{mainTitle}</div>
     </div>
   );
 };
 
-export default Breadcrumbs;
+export default withProviderConsumer(Breadcrumbs, ['activeAdviser']);

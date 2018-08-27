@@ -1,0 +1,47 @@
+.Success {
+  line-height: 2em;
+  margin: 0 1em 1em 1em;
+  padding: 1em;
+  color: #383838;
+  font-size: 1.2em;
+  background: #f2f9ea;
+  border: 0.1em solid #89c535;
+
+  .SuccessDetails {
+    display: flex;
+  }
+
+  .SuccessDetails::after {
+    content: " ";
+    background: url("#{$resourcePath}nbb_check_neg.svg");
+    background-repeat: no-repeat;
+    background-size: 15px 15px;
+    height: 15px;
+    width: 15px;
+    margin-left: 5px;
+    margin-top: 3px;
+  }
+}
+
+.Error {
+  line-height: 2em;
+  margin: 1em;
+  padding: 1em;
+  color: #b92215;
+  font-size: 1.2em;
+  background: #f9e8e7;
+  border: 0.1em solid #b92215;
+
+  .ErrorDetails {
+    text-decoration: underline;
+    margin: 0 1em;
+    li {
+      list-style-type: disc;
+    }
+  }
+
+  .ErrorMsg {
+    font-size: 12px;
+    font-weight: normal;
+  }
+}

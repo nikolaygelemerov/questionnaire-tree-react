@@ -1,0 +1,207 @@
+.QuestionItem {
+  position: absolute;
+  width: 400px;
+  height: auto;
+  margin: 0 0 2px 0;
+  border: none !important;
+  box-shadow: none;
+  background-color: transparent;
+
+  .RemoveQuestion {
+    position: absolute;
+    top: -13px;
+    right: 66px;
+    z-index: 700;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    border: 2px solid $nbbGreyDark;
+    background-color: $nbbWhite;
+    cursor: pointer;
+    float: right;
+
+    &.RemoveQuestion:before,
+    &.RemoveQuestion:after {
+      position: absolute;
+      top: 4px;
+      left: 12px;
+      content: " ";
+      height: 18px;
+      width: 2px;
+      background-color: $nbbGreyDark;
+    }
+
+    &.RemoveQuestion:before {
+      transform: rotate(45deg);
+    }
+
+    &.RemoveQuestion:after {
+      transform: rotate(-45deg);
+    }
+  }
+
+  .BorderTop {
+    width: 320px;
+    height: 4px;
+  }
+
+  .QuestionContent {
+    border-top: none;
+
+    .QuestionGroupName {
+      display: flex;
+      align-items: center;
+      width: 320px;
+      height: 40px;
+      padding-left: 5px;
+      color: $nbbFontDark;
+      font-size: 16px;
+      border: 1px solid $nbbGreySemiDark;
+      border-bottom: none;
+      background-color: $nbbWhite;
+
+      .GroupImage {
+        width: 30px;
+        height: 90%;
+        margin-right: 5px;
+        background: url("") no-repeat center;
+        background-size: contain;
+
+        &.QuestionCheckbox {
+          background-image: url("#{$resourcePath}filter_single.svg");
+        }
+
+        &.QuestionRadio {
+          background-image: url("#{$resourcePath}subpath_single.svg");
+        }
+
+        &.QuestionSlider {
+          background-image: url("#{$resourcePath}slider_single.svg");
+        }
+      }
+    }
+
+    .GroupDescription {
+      width: 320px;
+      padding: 7px 7px 7px 10px;
+      color: $nbbFontDefault;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid $nbbGreySemiDark;
+      background-color: $nbbGreyLight;
+      overflow: hidden;
+    }
+
+    .QuestionsWrapper {
+      height: 0;
+      overflow: auto;
+
+      .AnswerWrapperCover {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        width: 320px;
+        height: 0;
+        background-color: $nbbWhite;
+        border: 1px solid $nbbGreySemiDark;
+        border-top: none;
+      }
+
+      .AnswersWrapper {
+        position: relative;
+        height: 0;
+        overflow-y: auto;
+
+        .SliderContentWrapper {
+          position: relative;
+          width: 320px;
+          height: 200px;
+          border: none;
+
+          .SliderBar {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            border: 1px solid $nbbGreySemiDark;
+            border-top: none;
+            border-bottom: none;
+            background-color: $nbbWhite;
+          }
+
+          .SliderAnswerWrapper {
+            position: absolute;
+            top: 50%;
+            transform: translate(0, -50%);
+            width: 100%;
+            border: none;
+          }
+
+          .Slider {
+            margin: 10px;
+
+            .SliderLine {
+              margin: 20px 0;
+              position: relative;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              height: 1px;
+              background-color: $nbbFontDefault;
+
+              .SliderCircle {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 1px solid $nbbOrange;
+                background-color: $nbbWhite;
+              }
+
+              .AnswerTextWrapper {
+                display: none;
+              }
+            }
+
+            .TextsWrapper {
+              position: relative;
+              .Text {
+                display: inline-block;
+                width: calc(50% - 10px);
+                margin-right: 10px;
+                word-break: break-all;
+
+                .MinSliderValue {
+                  text-align: left;
+                  margin-top: 10px;
+                  font-size: 14px;
+                  color: $nbbFontDefault;
+                }
+                .MaxSliderValue {
+                  text-align: right;
+                  margin-top: 10px;
+                  font-size: 14px;
+                  color: $nbbFontDefault;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .QuestionText {
+        width: 320px;
+        padding: 7px 7px 7px 10px;
+        color: $nbbFontDark;
+        font-size: 14px;
+        border: 1px solid $nbbGreySemiDark;
+        border-top: none;
+        border-bottom: none;
+        background-color: $nbbWhite;
+      }
+    }
+  }
+}

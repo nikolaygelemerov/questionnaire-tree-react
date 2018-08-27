@@ -7,7 +7,7 @@ import AllQuestions from './AllQuestions/AllQuestions';
 import MainData from './MainData/MainData';
 import AdviserInfoNavBar from '../../components/AdviserInfo/AdviserInfoNavBar/AdviserInfoNavBar';
 import URLS from '../../constants/urls';
-import mainDataState from './MainData/MainDataState';
+import withProviderConsumer from '../../hoc/withProviderConsumer/withProviderConsumer';
 
 class AdviserInfo extends Component {
   render() {
@@ -19,16 +19,17 @@ class AdviserInfo extends Component {
             <Route
               exact
               path={`${this.props.match.url}`}
-              component={() => <MainData edit={false} />}
+              component={MainData}
             />
             <Route
               exact
               path={`${this.props.match.url}${URLS.allQuestions}`}
               component={AllQuestions}
             />
-            <Redirect
-              from={`${this.props.match.url}${URLS.allQuestions}/:id`}
-              to={`${this.props.match.url}${URLS.allQuestions}`}
+            <Route
+              exact
+              path={`${this.props.match.url}${URLS.allQuestions}/:id`}
+              component={AllQuestions}
             />
             <Route
               exact
@@ -43,7 +44,7 @@ class AdviserInfo extends Component {
             <Route
               exact
               path={`${this.props.match.url}/:id`}
-              component={() => <MainData edit={true} />}
+              component={MainData}
             />
             <Redirect
               from={`${this.props.match.url}/:id`}
@@ -56,4 +57,4 @@ class AdviserInfo extends Component {
   }
 }
 
-export default AdviserInfo;
+export default withProviderConsumer(AdviserInfo, ['activeAdviser']);

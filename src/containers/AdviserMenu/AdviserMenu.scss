@@ -1,9 +1,11 @@
 .AdviserMenu {
   .Title {
-    height: 8rem;
-    margin-left: 2rem;
-    font-size: 2rem;
-    line-height: 8rem;
+    height: 80px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    font-size: 20px;
+    line-height: 80px;
     color: $nbbFontDefault;
   }
 
@@ -12,12 +14,12 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
-    margin-top: -1rem;
-    padding: 0 1rem 1rem;
+    margin-top: -10px;
+    padding: 0 10px 10px;
   }
 
   .ActionBtnWrapper {
-    width: 120px;
+    width: 170px;
     height: 40px;
   }
 
