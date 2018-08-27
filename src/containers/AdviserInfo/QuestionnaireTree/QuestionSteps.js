@@ -43,7 +43,11 @@ export const QuestionSteps = [
         },
         {
           id: 'q2_a3',
-          isParent: false
+          isParent: true
+        },
+        {
+          id: 'q2_a4',
+          isParent: true
         }
       ]
     },
@@ -113,7 +117,7 @@ export const QuestionSteps = [
       internalName: 'q4 Grafikkarte',
       publicName: 'Grafikkarte-Gaming',
       isMain: true,
-      questionText: 'What are you doing?',
+      questionText: '1 What are you doing?',
       id: 'q4',
       type: 'Radiobutton (Einfachauswahl)',
       parent: { questionId: 'q2', answerId: 'q2_a1', answerIndex: 0 },
@@ -156,6 +160,29 @@ export const QuestionSteps = [
       ]
     },
     {
+      internalName: 'q4 Grafikkarte',
+      publicName: 'Grafikkarte-Gaming',
+      isMain: true,
+      questionText: '3 What are you doing?',
+      id: 'q4',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q2', answerId: 'q2_a4', answerIndex: 3 },
+      answers: [
+        {
+          id: 'q4_a1',
+          isParent: false
+        },
+        {
+          id: 'q4_a2',
+          isParent: false
+        },
+        {
+          id: 'q4_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
       internalName: 'q5 Trafikkarte',
       publicName: 'Grafikkarte-Gaming',
       id: 'q5',
@@ -187,7 +214,7 @@ export const QuestionSteps = [
       answers: [
         {
           id: 'q6_a1',
-          isParent: true
+          isParent: false
         },
         {
           id: 'q6_a2',
@@ -213,7 +240,7 @@ export const QuestionSteps = [
         },
         {
           id: 'q7_a2',
-          isParent: false
+          isParent: true
         },
         {
           id: 'q7_a3',
@@ -230,24 +257,24 @@ export const QuestionSteps = [
       parent: { questionId: 'q34', answerId: 'q34_a3', answerIndex: 2 },
       answers: [
         {
-          id: 'q3_a1',
-          isParent: true
-        },
-        {
-          id: 'q3_a2',
-          isParent: true
-        },
-        {
-          id: 'q3_a3',
-          isParent: true
-        },
-        {
-          id: 'q3_a4',
+          id: 'q343_a1',
           isParent: false
         },
         {
-          id: 'q3_a5',
-          isParent: true
+          id: 'q343_a2',
+          isParent: false
+        },
+        {
+          id: 'q343_a3',
+          isParent: false
+        },
+        {
+          id: 'q343_a4',
+          isParent: false
+        },
+        {
+          id: 'q343_a5',
+          isParent: false
         }
       ]
     }
@@ -271,7 +298,11 @@ export const QuestionSteps = [
         },
         {
           id: 'q14_a3',
-          isParent: false
+          isParent: true
+        },
+        {
+          id: 'q14_a4',
+          isParent: true
         }
       ]
     },
@@ -281,7 +312,7 @@ export const QuestionSteps = [
       id: 'q8',
       questionText: 'Is everything ok?',
       type: 'Radiobutton (Einfachauswahl)',
-      parent: { questionId: 'q7', answerId: 'q7_a1', answerIndex: 0 },
+      parent: { questionId: 'q7', answerId: 'q7_a2', answerIndex: 1 },
       answers: [
         {
           id: 'q8_a1',
@@ -344,6 +375,50 @@ export const QuestionSteps = [
       ]
     },
     {
+      internalName: 'q104 Mobilitat',
+      publicName: 'Mobilitat-Gaming',
+      id: 'q104',
+      questionText: 'Is everything ok?',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q14', answerId: 'q14_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q104_a1',
+          isParent: true
+        },
+        {
+          id: 'q104_a2',
+          isParent: true
+        },
+        {
+          id: 'q104_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
+      internalName: 'q103 Mobilitat',
+      publicName: 'Mobilitat-Gaming',
+      id: 'q103',
+      questionText: 'Is everything ok?',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q14', answerId: 'q14_a4', answerIndex: 3 },
+      answers: [
+        {
+          id: 'q103_a1',
+          isParent: true
+        },
+        {
+          id: 'q103_a2',
+          isParent: true
+        },
+        {
+          id: 'q103_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
       internalName: 'q9 Testerat',
       publicName: 'Testerat-Gaming',
       id: 'q9',
@@ -353,15 +428,15 @@ export const QuestionSteps = [
       answers: [
         {
           id: 'q9_a1',
-          isParent: true
+          isParent: false
         },
         {
           id: 'q9_a2',
-          isParent: false
+          isParent: true
         },
         {
           id: 'q9_a3',
-          isParent: false
+          isParent: true
         }
       ]
     },
@@ -451,6 +526,94 @@ export const QuestionSteps = [
         },
         {
           id: 'q114_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
+      internalName: 'q23 Mobilitat',
+      publicName: 'Mobilitat-Gaming',
+      id: 'q23',
+      questionText: 'Is everything ok?',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q103', answerId: 'q103_a1', answerIndex: 0 },
+      answers: [
+        {
+          id: 'q23_a1',
+          isParent: true
+        },
+        {
+          id: 'q23_a2',
+          isParent: true
+        },
+        {
+          id: 'q23_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
+      internalName: 'q14333 Mobilitat',
+      publicName: 'Mobilitat-Gaming',
+      id: 'q14333',
+      questionText: 'Is everything ok?',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q103', answerId: 'q103_a2', answerIndex: 1 },
+      answers: [
+        {
+          id: 'q14333_a1',
+          isParent: true
+        },
+        {
+          id: 'q14333_a2',
+          isParent: true
+        },
+        {
+          id: 'q14333_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
+      internalName: 'q94 Testerat',
+      publicName: 'Testerat-Gaming',
+      id: 'q94',
+      questionText: 'Is Niki ok?',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q9', answerId: 'q9_a2', answerIndex: 1 },
+      answers: [
+        {
+          id: 'q94_a1',
+          isParent: true
+        },
+        {
+          id: 'q94_a2',
+          isParent: false
+        },
+        {
+          id: 'q94_a3',
+          isParent: false
+        }
+      ]
+    },
+    {
+      internalName: 'q549 Testerat',
+      publicName: 'Testerat-Gaming',
+      id: 'q549',
+      questionText: 'Is Niki ok?',
+      type: 'Radiobutton (Einfachauswahl)',
+      parent: { questionId: 'q9', answerId: 'q9_a3', answerIndex: 2 },
+      answers: [
+        {
+          id: 'q549_a1',
+          isParent: true
+        },
+        {
+          id: 'q549_a2',
+          isParent: false
+        },
+        {
+          id: 'q549_a3',
           isParent: false
         }
       ]

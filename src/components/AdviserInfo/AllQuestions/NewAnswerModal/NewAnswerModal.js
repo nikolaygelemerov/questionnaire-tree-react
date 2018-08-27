@@ -907,7 +907,8 @@ class NewAnswerModal extends Form {
                   styles.GroupImage
                 } ${this.addQuestionImageClass()}`}
               />
-              {this.props.activeQuestion.publicName}&nbsp;({this.getQuestionPublicNameSuffix()})
+              {this.props.activeQuestion.publicName} &nbsp;{' '}
+              {this.getQuestionPublicNameSuffix()}
             </div>
             {content}
           </div>

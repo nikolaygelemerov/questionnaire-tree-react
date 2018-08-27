@@ -70,7 +70,7 @@ const NewAnswer = props => {
       </div>
       <div className={styles.Content}>
         <div className={styles.QuestionType}>
-          {props.questionType.type}&nbsp;
+          {props.questionType.type} &nbsp;
           {translations.questionTypeSuffix}
         </div>
         {formElements}
